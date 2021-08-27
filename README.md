@@ -2,6 +2,8 @@
 
 Bot Telegram For Trading in Kraken exchange
 
+> Blockquotes
+> 
 1. Trading
 2. Buy
 3. Sell
@@ -9,10 +11,13 @@ Bot Telegram For Trading in Kraken exchange
 5. Balance
 6. Alerts up price 
 7. Alerts down price 
-8. Currency prices 
-9. Funding 
-10. Chart 
-11. Updates
+8. Alerts On/Off
+9. Currency prices 
+10. Funding 
+11. Chart 
+12. Updates
+
+> Blockquotes
 
 For install execute:
 
