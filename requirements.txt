@@ -1,0 +1,5 @@
+krakenex==2.0.0
+requests==2.18.4
+beautifulsoup4==4.6.0
+python-telegram-bot==13.7.0
+jsonlines==2.0.0

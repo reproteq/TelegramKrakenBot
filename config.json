@@ -1,0 +1,37 @@
+{
+    "user_id": "",
+    "bot_token": "",
+    "base_currency": "EUR",
+    "check_trade": 30,
+    "history_items": 3,
+    "fee": 0.22,
+    "update_url": "https://raw.githubusercontent.com/reproteq/TelegramKrakenBot/",
+    "update_hash": "some_hash",
+    "_this is a comment  update_check": 86400,
+    "update_check": 0,
+    "send_error": false,
+    "show_access_denied": true,
+    "used_pairs": {        
+        "XBT": "EUR",
+        "ADA": "EUR"
+
+    },
+    "coin_charts": {
+        "BTC": "https://tinyurl.com/y9p6g5a8"
+
+
+    },
+    "log_level": 10,
+    "log_to_file": false,
+    "retries": 2,
+    "single_price": true,
+    "single_chart": true,
+    "single_order": true,
+    "decimals": 6,
+    "webhook_enabled": false,
+    "webhook_listen": "0.0.0.0",
+    "webhook_port": 8443,
+    "webhook_key": "path_to_privkey.pem",
+    "webhook_cert": "path_to_cert.pem",
+    "webhook_url": "HTTPS_URL:PORT/TOKEN"
+}
