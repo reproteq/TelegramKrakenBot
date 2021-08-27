@@ -2,6 +2,12 @@
 ---
 #### Python3 Bot Telegram For Trading in Kraken exchange
 
+
+
+
+![alt tag](https://github.com/reproteq/TelegramKrakenBot/blob/main/TelegramKrakenBot.gif) 
+
+---
 ---
 
 > #### Functions:
@@ -106,12 +112,6 @@ beautifulsoup4==4.6.0
 python-telegram-bot==13.7.0
 
 jsonlines==2.0.0
-
-
-> Images
-
-
-![alt tag](https://github.com/reproteq/TelegramKrakenBot/blob/main/TelegramKrakenBot.gif) 
 
 
 
