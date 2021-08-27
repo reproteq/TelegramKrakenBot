@@ -17,7 +17,8 @@
 11. Chart 
 12. Updates
 
-> Install
+---
+> # Install
 For install execute:
 
 pip3 install -r requirements.txt
