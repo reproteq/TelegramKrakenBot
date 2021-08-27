@@ -1,8 +1,18 @@
-### TelegramKrakenBot
+# TelegramKrakenBot
 
 Bot Telegram For Trading in Kraken exchange
 
-# Trading, buy, sell, orders, balance, alerts up price , alerts down price, currency prices, funding, chart, updates ...
+1. Trading
+2. Buy
+3. Sell
+4. Orders 
+5. Balance
+6. Alerts up price 
+7. Alerts down price 
+8. Currency prices 
+9. Funding 
+10. Chart 
+11. Updates
 
 For install execute:
 
