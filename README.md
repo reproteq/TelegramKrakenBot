@@ -1,12 +1,16 @@
 # TelegramKrakenBot
+
 Bot Telegram For Trading in Kraken exchange
+
 Trading, alerts, prices, funding, updates ...
 
 For install execute:
+
 pip3 install -r requirements.txt
 
 
 Install newest versions of needed modules
+
 If you want to install the newest versions of the needed modules, execute the following:
 
 pip3 install python-telegram-bot -U
@@ -22,6 +26,8 @@ pip3 install jsonlines -U
 For show all list of moduls installed in pip3 execute:
 
 pip3 list
+
+
 
 
 
