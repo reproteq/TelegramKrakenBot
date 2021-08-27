@@ -8,20 +8,20 @@
 
 > #### Functions
 
-  - 1. Trading
-  - 2. Buy
-  - 3. Sell
-  - 4. Orders 
-  - 5. Balance
-  - 6. Alerts up price 
-  - 7. Alerts down price 
-  - 8. Alerts On/Off
-  - 9. Currency prices 
-  - 10. Funding 
-  - 11. Chart 
-  - 12. Updates
-  - 13. Check status api
-  - 14. Config api
+  - Trading
+  - Buy
+  - Sell
+  - Orders 
+  - Balance
+  - Alerts up price 
+  - Alerts down price 
+  - Alerts On/Off
+  - Currency prices 
+  - Funding 
+  - Chart 
+  - Updates
+  - Check status api
+  - Config api
 
 ---
 > #### Install
