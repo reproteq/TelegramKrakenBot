@@ -117,11 +117,11 @@ jsonlines==2.0.0
 ---
 > #### Info
 
-Donations btc
+Donations ₿ BTC 🥇
 
 1Mmwhdw4mQzbuLbmPFdEF2uXMVi8X3kv68
 
-paypal 
+paypal 💵
 
 reproteq@gmail.com
 
