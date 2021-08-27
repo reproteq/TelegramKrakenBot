@@ -5,40 +5,60 @@ Trading, alerts, prices, funding, updates ...
 For install execute:
 pip3 install -r requirements.txt
 
-pip3 list
+
 Install newest versions of needed modules
 If you want to install the newest versions of the needed modules, execute the following:
 
 pip3 install python-telegram-bot -U
+
 pip3 install beautifulsoup4 -U
+
 pip3 install krakenex -U
+
 pip3 install requests -U
+
 pip3 install jsonlines -U
+
+For show all list of moduls installed in pip3 execute:
+
+pip3 list
 
 
 
 Starting
+
 To start the bot execute:
+
 python3 bot.py &
 
 
 
 Starting
+
 To start the bot but not close this when close shell execute:
+
 nohup python3 bot.py &
 
 
 Closing:
+
 ps -ef | grep python3
+
 kill id-process of python3 bot.py
+
 
 Tested versions
 
-python3==3.8.1
+python3==3.8.10
+
 krakenex==2.0.0
+
 requests==2.18.4
+
 beautifulsoup4==4.6.0
+
 python-telegram-bot==13.7.0
+
 jsonlines==2.0.0
 
 
