@@ -1,4 +1,4 @@
-# TelegramKrakenBot 🤖 💱
+# TelegramKrakenBot   🤖 💱
 ---
 ## Python3 Telegram Bot For Trading in Kraken exchange
 
