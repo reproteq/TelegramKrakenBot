@@ -125,4 +125,6 @@ paypal
 
 reproteq@gmail.com
 
+Skype: Reproteq 
+
 Special thanks Endogen 🖖
