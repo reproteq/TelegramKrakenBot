@@ -1,6 +1,7 @@
-## TelegramKrakenBot
+# TelegramKrakenBot
 
 ### Bot Telegram For Trading in Kraken exchange
+---
 
 > Functions:
 
@@ -18,7 +19,7 @@
 12. Updates
 
 ---
-> # Install
+> ###Install
 For install execute:
 
 pip3 install -r requirements.txt
@@ -44,7 +45,7 @@ pip3 list
 
 
 
-> Config
+> ###Config
 
 Edit files for configuration:
 
