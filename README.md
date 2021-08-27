@@ -1,7 +1,8 @@
 # TelegramKrakenBot
+---
+### Pyrhon3 Bot Telegram For Trading in Kraken exchange
 
-### Bot Telegram For Trading in Kraken exchange
--
+---
 
 > Functions:
 
@@ -18,7 +19,7 @@
 11. Chart 
 12. Updates
 
----
+
 > Install
 For install execute:
 
