@@ -42,7 +42,7 @@ If you want install the newest versions of the needed modules execute:
 
 For show all list of modules installed in pip3 execute:
 
-  pip3 list
+ - pip3 list
 
 
 ---
