@@ -4,7 +4,7 @@
 
 ---
 
-> Functions:
+> ### Functions:
 
 1. Trading
 2. Buy
