@@ -8,41 +8,41 @@
 
 > #### Functions
 
-1. Trading
-2. Buy
-3. Sell
-4. Orders 
-5. Balance
-6. Alerts up price 
-7. Alerts down price 
-8. Alerts On/Off
-9. Currency prices 
-10. Funding 
-11. Chart 
-12. Updates
+  1. Trading
+  2. Buy
+  3. Sell
+  4. Orders 
+  5. Balance
+  6. Alerts up price 
+  7. Alerts down price 
+  8. Alerts On/Off
+  9. Currency prices 
+  10. Funding 
+  11. Chart 
+  12. Updates
 
 ---
 > #### Install
 For install execute:
 
-pip3 install -r requirements.txt
+  pip3 install -r requirements.txt
 
 
 If you want install the newest versions of the needed modules execute:
 
-pip3 install python-telegram-bot -U
+  pip3 install python-telegram-bot -U
 
-pip3 install beautifulsoup4 -U
+  pip3 install beautifulsoup4 -U
 
-pip3 install krakenex -U
+  pip3 install krakenex -U
 
-pip3 install requests -U
+  pip3 install requests -U
 
-pip3 install jsonlines -U
+  pip3 install jsonlines -U
 
 For show all list of modules installed in pip3 execute:
 
-pip3 list
+  pip3 list
 
 
 ---
@@ -52,18 +52,18 @@ Edit files for configuration:
 
 - kraken.key
 
-key 56 chars
+  key 56 chars
 
-key 88 chars
+  key 88 chars
 
 
 
 
 - config.json
 
-"user_id": "write here you telegram user_id"
+  "user_id": "write here you telegram user_id"
 
-"bot_token": "write here you telegram bot_token"
+  "bot_token": "write here you telegram bot_token"
 
 
 ---
@@ -73,7 +73,7 @@ Starting
 
 To start the bot execute:
 
-python3 bot.py &
+  python3 bot.py &
 
 
 
@@ -81,7 +81,7 @@ Starting
 
 To start the bot permanently so that it does not close when you close the window shell execute:
 
-nohup python3 bot.py &
+  nohup python3 bot.py &
 
 
 
@@ -89,11 +89,11 @@ Closing
 
 For see python3 process execute:
 
-ps -ef | grep python3
+  ps -ef | grep python3
 
 now execute:
 
-kill id-process bot.py
+  kill id-process bot.py
 
 
 ---
@@ -101,30 +101,30 @@ kill id-process bot.py
 
 Tested versions
 
-python3==3.8.10
+  python3==3.8.10
 
-krakenex==2.0.0
+  krakenex==2.0.0
 
-requests==2.18.4
+  requests==2.18.4
 
-beautifulsoup4==4.6.0
+  beautifulsoup4==4.6.0
 
-python-telegram-bot==13.7.0
+  python-telegram-bot==13.7.0
 
-jsonlines==2.0.0
+  jsonlines==2.0.0
 
 
 ---
 > #### Info
 
-Donations ₿ BTC 🥇
+  Donations ₿ BTC 🥇
 
-1Mmwhdw4mQzbuLbmPFdEF2uXMVi8X3kv68
+  1Mmwhdw4mQzbuLbmPFdEF2uXMVi8X3kv68
 
-paypal 💵
+  paypal 💵
 
-reproteq@gmail.com
+  reproteq@gmail.com
 
-Skype: Reproteq 
+  Skype: Reproteq 
 
-Special thanks Endogen 🖖
+  Special thanks Endogen 🖖
