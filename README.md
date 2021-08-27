@@ -50,7 +50,7 @@ pip3 list
 
 Edit files for configuration:
 
-kraken.key
+- kraken.key
 
 key 56 chars
 
@@ -59,7 +59,7 @@ key 88 chars
 
 
 
-config.json
+- config.json
 
 "user_id": "write here you telegram user_id"
 
