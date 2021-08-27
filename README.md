@@ -73,7 +73,7 @@ Starting
 
 To start the bot execute:
 
-  python3 bot.py &
+ - python3 bot.py &
 
 
 
@@ -81,7 +81,7 @@ Starting
 
 To start the bot permanently so that it does not close when you close the window shell execute:
 
-  nohup python3 bot.py &
+ - nohup python3 bot.py &
 
 
 
@@ -89,11 +89,11 @@ Closing
 
 For see python3 process execute:
 
-  ps -ef | grep python3
+ - ps -ef | grep python3
 
 now execute:
 
-  kill id-process bot.py
+ - kill id-process bot.py
 
 
 ---
@@ -101,17 +101,17 @@ now execute:
 
 Tested versions
 
-  python3==3.8.10
+ - python3==3.8.10
 
-  krakenex==2.0.0
+ - krakenex==2.0.0
 
-  requests==2.18.4
+ - requests==2.18.4
 
-  beautifulsoup4==4.6.0
+ - beautifulsoup4==4.6.0
 
-  python-telegram-bot==13.7.0
+ - python-telegram-bot==13.7.0
 
-  jsonlines==2.0.0
+ - jsonlines==2.0.0
 
 
 ---
