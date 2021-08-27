@@ -50,11 +50,13 @@ For show all list of modules installed in pip3 execute:
 
 Edit files for configuration:
 
+- You need to have or create Kraken ApiKey with alls privileges
+
 - kraken.key
 
-  key 56 chars
+  Line1 write here your kraken Api key 56 chars
 
-  key 88 chars
+  Line2 write here your kraken secret key 88 chars
 
 
 
