@@ -1,4 +1,4 @@
-# TelegramKrakenBot
+# TelegramKrakenBot 🤖 💱
 ---
 ## Python3 Telegram Bot For Trading in Kraken exchange
 
@@ -125,4 +125,4 @@ paypal
 
 reproteq@gmail.com
 
-Special thanks Endogen
+Special thanks Endogen 🖖
