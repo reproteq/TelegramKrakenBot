@@ -2,12 +2,8 @@
 ---
 #### Python3 Bot Telegram For Trading in Kraken exchange
 
-
-
-
 ![alt tag](https://github.com/reproteq/TelegramKrakenBot/blob/main/TelegramKrakenBot.gif) 
 
----
 ---
 
 > #### Functions:
@@ -51,8 +47,8 @@ For show all list of moduls installed in pip3 execute:
 pip3 list
 
 
-
-> ###Config
+---
+> #### Config
 
 Edit files for configuration:
 
@@ -72,7 +68,8 @@ config.json
 "bot_token": "write here you telegram bot_token"
 
 
-> Start
+---
+> #### Start
 
 Starting
 
@@ -97,7 +94,8 @@ ps -ef | grep python3
 kill id-process of python3 bot.py
 
 
-> Tested
+---
+> #### Tested
 
 Tested versions
 
@@ -114,8 +112,8 @@ python-telegram-bot==13.7.0
 jsonlines==2.0.0
 
 
-
-> Info
+---
+> #### Info
 
 Donations btc
 
@@ -125,4 +123,4 @@ paypal
 
 reproteq@gmail.com
 
-
+Special thanks to Endogen
