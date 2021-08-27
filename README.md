@@ -25,20 +25,20 @@
 > #### Install
 For install execute:
 
-  pip3 install -r requirements.txt
+ - pip3 install -r requirements.txt
 
 
 If you want install the newest versions of the needed modules execute:
 
-  pip3 install python-telegram-bot -U
+ - pip3 install python-telegram-bot -U
 
-  pip3 install beautifulsoup4 -U
+ - pip3 install beautifulsoup4 -U
 
-  pip3 install krakenex -U
+ - pip3 install krakenex -U
 
-  pip3 install requests -U
+ - pip3 install requests -U
 
-  pip3 install jsonlines -U
+ - pip3 install jsonlines -U
 
 For show all list of modules installed in pip3 execute:
 
