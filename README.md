@@ -6,7 +6,7 @@
 
 ---
 
-> #### Functions:
+> #### Functions
 
 1. Trading
 2. Buy
@@ -85,7 +85,7 @@ nohup python3 bot.py &
 
 
 
-Closing:
+Closing
 
 For see python3 process execute:
 
