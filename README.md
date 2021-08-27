@@ -1,6 +1,6 @@
 # TelegramKrakenBot
 ---
-## Python3 Bot Telegram For Trading in Kraken exchange
+## Python3 Telegram Bot For Trading in Kraken exchange
 
 ![alt tag](https://github.com/reproteq/TelegramKrakenBot/blob/main/TelegramKrakenBot.gif) 
 
@@ -123,4 +123,4 @@ paypal
 
 reproteq@gmail.com
 
-Special thanks to Endogen
+Special thanks Endogen
