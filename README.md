@@ -28,9 +28,7 @@ For install execute:
 pip3 install -r requirements.txt
 
 
-Install newest versions of needed modules
-
-If you want to install the newest versions of the needed modules, execute the following:
+If you want install the newest versions of the needed modules execute:
 
 pip3 install python-telegram-bot -U
 
@@ -42,7 +40,7 @@ pip3 install requests -U
 
 pip3 install jsonlines -U
 
-For show all list of moduls installed in pip3 execute:
+For show all list of modules installed in pip3 execute:
 
 pip3 list
 
@@ -81,7 +79,7 @@ python3 bot.py &
 
 Starting
 
-To start the bot but not close this when close shell execute:
+To start the bot permanently so that it does not close when you close the window shell execute:
 
 nohup python3 bot.py &
 
@@ -89,9 +87,13 @@ nohup python3 bot.py &
 
 Closing:
 
+For see python3 process execute:
+
 ps -ef | grep python3
 
-kill id-process of python3 bot.py
+now execute:
+
+kill id-process bot.py
 
 
 ---
