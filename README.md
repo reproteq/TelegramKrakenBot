@@ -2,6 +2,8 @@
 
 ### Bot Telegram For Trading in Kraken exchange
 
+> Functions:
+
 1. Trading
 2. Buy
 3. Sell
@@ -15,7 +17,7 @@
 11. Chart 
 12. Updates
 
-
+> Install
 For install execute:
 
 pip3 install -r requirements.txt
@@ -41,7 +43,7 @@ pip3 list
 
 
 
-
+> Config
 
 Edit files for configuration:
 
@@ -61,7 +63,7 @@ config.json
 "bot_token": "write here you telegram bot_token"
 
 
-
+> Start
 
 Starting
 
@@ -86,7 +88,7 @@ ps -ef | grep python3
 kill id-process of python3 bot.py
 
 
-
+> Tested
 
 Tested versions
 
@@ -103,13 +105,14 @@ python-telegram-bot==13.7.0
 jsonlines==2.0.0
 
 
+> Images
 
 
 ![alt tag](https://github.com/reproteq/TelegramKrakenBot/blob/main/TelegramKrakenBot.gif) 
 
 
 
-
+> Info
 
 Donations btc
 
