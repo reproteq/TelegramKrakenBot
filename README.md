@@ -2,7 +2,7 @@
 
 Bot Telegram For Trading in Kraken exchange
 
-Trading, alerts, prices, funding, updates ...
+Trading, buy, sell, orders, balance, alerts up price , alerts down price, currency prices, funding, chart, updates ...
 
 For install execute:
 
@@ -31,6 +31,26 @@ pip3 list
 
 
 
+Edit files for configuration:
+
+kraken.key
+
+key 56 chars
+
+key 88 chars
+
+
+
+
+config.json
+
+"user_id": "write here you telegram user_id"
+
+"bot_token": "write here you telegram bot_token"
+
+
+
+
 Starting
 
 To start the bot execute:
@@ -46,11 +66,14 @@ To start the bot but not close this when close shell execute:
 nohup python3 bot.py &
 
 
+
 Closing:
 
 ps -ef | grep python3
 
 kill id-process of python3 bot.py
+
+
 
 
 Tested versions
