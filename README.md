@@ -1,9 +1,7 @@
-# TelegramKrakenBot
+## TelegramKrakenBot
 
-Bot Telegram For Trading in Kraken exchange
+### Bot Telegram For Trading in Kraken exchange
 
-> Blockquotes
-> 
 1. Trading
 2. Buy
 3. Sell
@@ -17,7 +15,6 @@ Bot Telegram For Trading in Kraken exchange
 11. Chart 
 12. Updates
 
-> Blockquotes
 
 For install execute:
 
