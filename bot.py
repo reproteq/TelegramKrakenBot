@@ -102,12 +102,13 @@ def kraken_api(method, data=None, private=False, retries=None):
 
 def restrict_access(func):
     def _restrict_access(update: Update, context: CallbackContext):
+        chat_data = context.chat_data
         chat_id = get_chat_id(update)
         if str(chat_id) != config["user_id"]:
             if config["show_access_denied"]:
-                bot.send_message(chat_id, text="Access denied")
+                updater.bot.send_message(chat_id, text="Access denied")
                 msg = "Access denied for user %s" % chat_id
-                bot.send_message(config["user_id"], text=msg)
+                updater.bot.send_message(config["user_id"], text=msg)
 
             log(logging.WARNING, msg)
             return
