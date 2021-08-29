@@ -162,7 +162,31 @@ def balance_cmd(update: Update, context: CallbackContext):
         # Only show assets with volume > 0
         if trim_zeros(currency_value) != "0":
             msg += bold(assets[currency_key]["altname"] + ": " + trim_zeros(currency_value) + "\n")
+           
+           
+            #calc balance from last price            
+            req_data = dict()
+            req_data["pair"] = str()    
+            # Add all configured asset pairs to the request
+            for asset, trade_pair in pairs.items():
+                req_data["pair"] += trade_pair + ","    
+            req_data = {"pair": pairs[assets[currency_key]["altname"]]}            
+            res_data = kraken_api("Ticker", data=req_data, private=False)                 
+            last_trade_price = trim_zeros(res_data["result"][req_data["pair"]]["c"][0])
 
+            
+            for pair, data in res_data["result"].items():
+                last_trade_price = trim_zeros(data["c"][0])
+                coin = list(pairs.keys())[list(pairs.values()).index(pair)]
+                   
+            
+            calc_price_currency = round((float(currency_value) *  float(last_trade_price)), 2)
+            
+            msg += bold("Price " + assets[currency_key]["altname"] + ": " +  last_trade_price + ' ' + config["used_pairs"][coin] + "\n")
+            msg += bold("Balace" + ": " + str(calc_price_currency)  + ' ' +  config["used_pairs"][coin] + "\n")
+            
+            ###
+            
             available_value = trim_zeros(float(available_value))
             currency_value = trim_zeros(float(currency_value))
 
@@ -616,9 +640,9 @@ def trade_sell_all_confirm(update: Update, context: CallbackContext):
 
        # req_data["volume"] = amount #ori
         #ttcode patch for fix EOrder: Insufficient funds
-        fixVol = float(0.000001)
-        req_data["volume"] = amount - fixVol
-        
+        fixVol = float(0.0000002) # fix EOrder: Insufficient funds
+        chatVol = float(chat_data["volume"])    
+        req_data["volume"] = str(chatVol - fixVol)   
         
         # Send request to create order to Kraken
         res_add_order = kraken_api("AddOrder", data=req_data, private=True)
@@ -927,7 +951,7 @@ def trade_show_conf(update: Update, context: CallbackContext):
         price = chat_data["price"]
         nfee = FxFee(action, float(vol), float(price))
         flofee = float(nfee)
-        strfee = str(nfee)        
+        strfee = str(round(nfee, 2))        
         strconfee = str(float(config["fee"]))
         update.message.reply_text(e_wit + "Fee " + strconfee + "% " + strfee +" " + asset_two)
 
@@ -944,7 +968,7 @@ def trade_show_conf(update: Update, context: CallbackContext):
         price = chat_data["price"]
         nfee = FxFee(action, float(vol), float(price))
         flofee = float(nfee)
-        strfee = str(nfee)
+        strfee = str(round(nfee, 2))
         strconfee = str(float(config["fee"]))
         update.message.reply_text(e_wit + "Fee " + strconfee + "% " + strfee +" " + asset_two)
 
