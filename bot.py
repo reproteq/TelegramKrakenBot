@@ -116,6 +116,8 @@ def restrict_access(func):
             return func(update, context)
     return _restrict_access
 
+
+#todo balance con precio
 @restrict_access
 def balance_cmd(update: Update, context: CallbackContext):
     update.message.reply_text(e_wit + "Retrieving "+ e_sac + "balance..." )
@@ -734,12 +736,12 @@ def trade_vol_volume(update: Update, context: CallbackContext):
 def FxFee(action, vol ,price):
     
     if action == "buy":        
-        flofee = config["fee"]
+        flofee = float(config["fee"])
         res = vol % flofee * 100
         resRound = round(res, 8)
         
     if action == "sell":
-        flofee = config["fee"]
+        flofee = float(config["fee"])
         res = (flofee * (vol * price)/ 100)
         resRound = round(res, 8)
         
@@ -926,7 +928,7 @@ def trade_show_conf(update: Update, context: CallbackContext):
         nfee = FxFee(action, float(vol), float(price))
         flofee = float(nfee)
         strfee = str(nfee)        
-        strconfee = str(config["fee"])
+        strconfee = str(float(config["fee"]))
         update.message.reply_text(e_wit + "Fee " + strconfee + "% " + strfee +" " + asset_two)
 
     else:
@@ -943,7 +945,7 @@ def trade_show_conf(update: Update, context: CallbackContext):
         nfee = FxFee(action, float(vol), float(price))
         flofee = float(nfee)
         strfee = str(nfee)
-        strconfee = str(config["fee"])
+        strconfee = str(float(config["fee"]))
         update.message.reply_text(e_wit + "Fee " + strconfee + "% " + strfee +" " + asset_two)
 
 
@@ -2581,10 +2583,15 @@ if config["check_trade"] > 0:
 
 
 ###### ALERT LOOP TIMER THREAD  IN #######
+global alerts_timer
+global alerts_sleeper
+alerts_timer = config["alerts_timer"]  # sec
+alerts_sleeper = config["alerts_sleeper"] # sec
+
 
 class TimerThread(threading.Thread):
    
-    def __init__(self, timeout=3, sleep_chunk=0.25, callback=None, *args):
+    def __init__(self, timeout=alerts_timer, sleep_chunk=alerts_sleeper, callback=None, *args):
         threading.Thread.__init__(self)
 
         self.timeout = timeout
@@ -2637,7 +2644,7 @@ class TimerThread(threading.Thread):
 
 ######### CALLBACK ALERT LOOP
 def my_callback_function():
-    print ('Alert callback ...')  
+    #print ('Alert callback ...')  
     file_path = "alerts.json" 
     with jsonlines.open(file_path) as f:
         for line in f.iter():
@@ -2659,7 +2666,7 @@ def my_callback_function():
                 
             last_trade_price = trim_zeros(res_data["result"][req_data["pair"]]["c"][0])
             
-            print('Operation :' + linecurrency +" " + linealert + " " + last_trade_price + " <>= " + lineprice)           
+           # print('Operation :' + linecurrency +" " + linealert + " " + last_trade_price + " <>= " + lineprice)           
            # print('linealert :' + linealert)
            # print('lineprice :' + lineprice)
            # print('lastradeprice :' + last_trade_price)
@@ -2670,19 +2677,19 @@ def my_callback_function():
                 updater = Updater(token=config["bot_token"])    
                 msg = e_ntf + e_dwt + e_adw + linecurrency + ' = ' + last_trade_price + '€ ' +'  ' + e_ntf +' '+ lineprice +'€ '
                 updater.bot.send_message(chat_id=config["user_id"], text=msg)
-                print('.......... Operation Down OK :' + linecurrency +" " + linealert + " " + last_trade_price + " <= " + lineprice)
+                #print('.......... Operation Down OK :' + linecurrency +" " + linealert + " " + last_trade_price + " <= " + lineprice)
                 
             #alert if pricemarket is mayor o igual
             if((linealert == 'new alert up') and (float(last_trade_price) >= float(lineprice))):
                 updater = Updater(token=config["bot_token"])    
                 msg = e_ntf + e_upt + e_aup + linecurrency + ' = ' + last_trade_price + '€ ' +'  ' + e_ntf +' '+ lineprice +'€ '
                 updater.bot.send_message(chat_id=config["user_id"], text=msg)
-                print('.......... Operation Up OK :' + linecurrency +" " + linealert + " " + last_trade_price + " >= " + lineprice)
+                #print('.......... Operation Up OK :' + linecurrency +" " + linealert + " " + last_trade_price + " >= " + lineprice)
        
             
 ########### TIMER THREAD
-timeout = 5  # sec
-sleep_chunk = .25  # sec
+timeout = alerts_timer # sec
+sleep_chunk = alerts_sleeper  # sec
 
 tmr = TimerThread(timeout, sleep_chunk, my_callback_function)
 tmr.start()
@@ -2691,17 +2698,17 @@ alertsw = ''
 quit = '0'
 while True:
     tmr.start_timer()
-    print('Timer ...')
+    #print('Timer ...')
     if alertsw == 'Terminate':
         tmr.terminate()
         tmr.join()
         break
 
     if alertsw == 'Stop':
-        print('StopTimer ...')
+        #print('StopTimer ...')
         tmr.stop_timer()
     if alertsw == 'Restart':
-        print('RestarTimer ...')
+        #print('RestarTimer ...')
         tmr.restart_timer()
     time.sleep(timeout)    
 
