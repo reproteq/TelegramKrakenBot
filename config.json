@@ -17,7 +17,8 @@
         "ADA": "EUR"
     },
     "coin_charts": {
-        "BTC": "https://tinyurl.com/y9p6g5a8"
+        "BTC": "https://tinyurl.com/y9p6g5a8",
+        "ADA": "https://tinyurl.com/2usx5m9s"
     },
     "log_level": 10,
     "log_to_file": false,
