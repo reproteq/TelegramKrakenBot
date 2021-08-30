@@ -132,6 +132,4 @@ Tested versions
   Skype: Reproteq 
 
   Special thanks Endogen 🖖   
-  
-  [![Github All Releases](https://img.shields.io/github/downloads/reproteq/TelegramKrakenBot/total.svg)]()
 
