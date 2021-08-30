@@ -133,5 +133,7 @@ Tested versions
 
   Special thanks Endogen 🖖
   
+  [![PyPI download total](https://img.shields.io/pypi/dt/ansicolortags.svg)](https://pypi.python.org/pypi/ansicolortags/)
+
     
   [![Github All Releases](https://img.shields.io/github/downloads/reproteq/TelegramKrakenBot/total.svg)]()
