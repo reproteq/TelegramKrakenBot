@@ -5,10 +5,7 @@
 ![alt tag](https://github.com/reproteq/TelegramKrakenBot/blob/main/TelegramKrakenBot.gif) 
 
 
-
-[![IMAGE ALT TEXT](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg)](https://www.youtube.com/watch?v=Rrmb_6cPzFE "TelegramKrakenBot")
-
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg)](https://www.youtube.com/watch?v=Rrmb_6cPzFE)
+[![Alt text](https://img.youtube.com/vi/Rrmb_6cPzFE/0.jpg)](https://www.youtube.com/watch?v=Rrmb_6cPzFE)
 
 ---
 
