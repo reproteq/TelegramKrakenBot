@@ -65,6 +65,9 @@ def log(severity, msg):
     logger.log(severity, msg)
 
 
+
+
+
 def kraken_api(method, data=None, private=False, retries=None):
     frame = inspect.currentframe()
     args, _, _, values = inspect.getargvalues(frame)
@@ -131,6 +134,8 @@ def balance_cmd(update: Update, context: CallbackContext):
 
     msg = str()
 
+
+
     for currency_key, currency_value in res_balance["result"].items():
         available_value = currency_value
 
@@ -145,7 +150,11 @@ def balance_cmd(update: Update, context: CallbackContext):
                 price_per_coin = order_desc_list[5]
 
                 # Check if asset is fiat-currency (EUR, USD, ...) and BUY order
-                if currency_key.startswith("Z") and order_type == "buy":
+                #https://api.kraken.com/0/public/Assets
+                #if currency_key.startswith("Z") and order_type == "buy":                
+                #falla pq cardano no contiene z, buscar eur en el nombre
+                
+                if currency_key.startswith("Z") and order_type == "buy" :
                     available_value = float(available_value) - (float(order_volume) * float(price_per_coin))
 
                 # Current asset is a coin and not a fiat currency
@@ -163,7 +172,7 @@ def balance_cmd(update: Update, context: CallbackContext):
         if trim_zeros(currency_value) != "0":
             msg += bold(assets[currency_key]["altname"] + ": " + trim_zeros(currency_value) + "\n")
            
-           
+            '''
             #calc balance from last price            
             req_data = dict()
             req_data["pair"] = str()    
@@ -186,7 +195,7 @@ def balance_cmd(update: Update, context: CallbackContext):
             msg += bold("Balace" + ": " + str(calc_price_currency)  + ' ' +  config["used_pairs"][coin] + "\n")
             
             ###
-            
+            '''            
             available_value = trim_zeros(float(available_value))
             currency_value = trim_zeros(float(currency_value))
 
@@ -637,8 +646,9 @@ def trade_sell_all_confirm(update: Update, context: CallbackContext):
         req_data["trading_agreement"] = "agree"
         req_data["pair"] = pairs[balance_asset]
         req_data["ordertype"] = "market"
-
+        
        # req_data["volume"] = amount #ori
+       
         #ttcode patch for fix EOrder: Insufficient funds
         fixVol = float(0.0000002) # fix EOrder: Insufficient funds
         chatVol = float(chat_data["volume"])    
@@ -661,8 +671,10 @@ def trade_sell_all_confirm(update: Update, context: CallbackContext):
 def trade_currency(update: Update, context: CallbackContext): 
     
     chat_data = context.chat_data
-    chat_data["currency"] = update.message.text.upper()
-
+    chat_data["currency"] = update.message.text.upper()        
+    #ttcode patch check len para ver si es nuevo formato       
+    #balance_asset =  krakenPair(balance_asset)
+        
     asset_one, asset_two = assets_in_pair(pairs[chat_data["currency"]])
     chat_data["one"] = asset_one
     chat_data["two"] = asset_two
@@ -1277,6 +1289,7 @@ def value_currency(update: Update, context: CallbackContext):
         if handle_api_error(res_trade_balance, update):
             return
 
+
         for asset, data in assets.items():
             if data["altname"] == config["base_currency"]:
                 if asset.startswith("Z"):
@@ -1300,6 +1313,7 @@ def value_currency(update: Update, context: CallbackContext):
             return
 
         req_price = dict()
+        
         # Get pair string for chosen currency
         req_price["pair"] = pairs[update.message.text.upper()]
 
@@ -1313,17 +1327,30 @@ def value_currency(update: Update, context: CallbackContext):
         # Get last trade price
         pair = list(res_price["result"].keys())[0]
         last_price = res_price["result"][pair]["c"][0]
+        
+        #fix issue ada
+        #asset = assets_in_pair(pair)
+        
+        print("----------pair--------------" + pair)
+        print("------last_price------------------" + last_price)
+
 
         value = float(0)
 
         for asset, data in assets.items():
             if data["altname"] == update.message.text.upper():
-                buy_from_cur_long = pair.replace(asset, "")
-                buy_from_cur = assets[buy_from_cur_long]["altname"]
-                # Calculate value by multiplying balance with last trade price
-                value = float(res_balance["result"][asset]) * float(last_price)
-                break
-
+                # if is format 8len same XXBTZEUR
+                if len(pair) == 8:
+                    buy_from_cur_long = pair.replace(asset, "")
+                    buy_from_cur = assets[buy_from_cur_long]["altname"]
+                    # Calculate value by multiplying balance with last trade price
+                    value = float(res_balance["result"][asset]) * float(last_price)
+                    break
+                else:                 
+                    # Calculate value by multiplying balance with last trade price
+                    value = float(res_balance["result"][asset]) * float(last_price)
+                    break
+        '''
         # If fiat currency, show 2 digits after decimal place
         if buy_from_cur_long.startswith("Z"):
             value = trim_zeros(value, 2)
@@ -1332,11 +1359,17 @@ def value_currency(update: Update, context: CallbackContext):
         else:
             value = trim_zeros(value)
             last_trade_price = trim_zeros(float(last_price))
-
-        msg = update.message.text.upper() + ": " + value + " " + buy_from_cur
+            
+        msg = update.message.text.upper() + ": " + value + " " + buy_from_cur    
+        '''
+        value = trim_zeros(value, 2)
+        last_trade_price = trim_zeros(float(last_price),2)
+        msg = update.message.text.upper() + ": " + str(value) 
 
         # Add last trade price to msg
-        msg += "\n(Ticker: " + last_trade_price + " " + buy_from_cur + ")"
+        #msg += "\n(Ticker: " + last_trade_price + " " + buy_from_cur + ")"
+        msg += "\n(Ticker: " + str(last_trade_price) +  ")"
+        
         update.message.reply_text(bold(msg), reply_markup=keyboard_cmds(), parse_mode=ParseMode.MARKDOWN)
 
     return ConversationHandler.END
@@ -2173,8 +2206,30 @@ def datetime_from_timestamp(unix_timestamp):
     return datetime.datetime.fromtimestamp(int(unix_timestamp)).strftime('%Y-%m-%d %H:%M:%S')
 
 
+#funcion para formatear nuevos pares
+def krakenPair(strapi):
+    #XXBTZEUR
+    #ADAEUR
+    lstrapi = len(strapi)
+    if lstrapi == 6:
+        
+        part1 = strapi[0:3]
+        part2 = strapi[3:6]
+        res = 'X' + part1 + 'Z' +  part2      
+
+
+    else:
+        res = strapi
+    return res
+
+
 # From pair string (XXBTZEUR) get from-asset (XXBT) and to-asset (ZEUR)
+# fix issue if new format example (ADAEUR) 6 len or old format 
 def assets_in_pair(pair):
+    
+    #chek long pair forknow format and fix kraken pair 6len or 8 len pair string (XXBTZEUR)
+    pair = krakenPair(pair)    
+    
     for asset, _ in assets.items():
         # If TRUE, we know that 'to_asset' exists in assets
         if pair.endswith(asset):
@@ -2185,7 +2240,9 @@ def assets_in_pair(pair):
             if from_asset in assets:
                 return from_asset, to_asset
             else:
-                return None, to_asset
+                #fix forada and other 6len
+                #return None, to_asset #ori
+                return from_asset, to_asset
 
     return None, None
 
@@ -2688,27 +2745,25 @@ def my_callback_function():
             
             res_data = kraken_api("Ticker", data=req_data, private=False)                
                 
-            last_trade_price = trim_zeros(res_data["result"][req_data["pair"]]["c"][0])
-            
+            last_trade_price = trim_zeros(res_data["result"][req_data["pair"]]["c"][0])            
            # print('Operation :' + linecurrency +" " + linealert + " " + last_trade_price + " <>= " + lineprice)           
            # print('linealert :' + linealert)
            # print('lineprice :' + lineprice)
-           # print('lastradeprice :' + last_trade_price)
-            
+           # print('lastradeprice :' + last_trade_price)           
             
             #alert if pricemarket is menor o igual
             if((linealert == 'new alert down') and (float(last_trade_price) <= float(lineprice))):
                 updater = Updater(token=config["bot_token"])    
                 msg = e_ntf + e_dwt + e_adw + linecurrency + ' = ' + last_trade_price + '€ ' +'  ' + e_ntf +' '+ lineprice +'€ '
                 updater.bot.send_message(chat_id=config["user_id"], text=msg)
-                #print('.......... Operation Down OK :' + linecurrency +" " + linealert + " " + last_trade_price + " <= " + lineprice)
+                #print('Operation Down OK :' + linecurrency +" " + linealert + " " + last_trade_price + " <= " + lineprice)
                 
             #alert if pricemarket is mayor o igual
             if((linealert == 'new alert up') and (float(last_trade_price) >= float(lineprice))):
                 updater = Updater(token=config["bot_token"])    
                 msg = e_ntf + e_upt + e_aup + linecurrency + ' = ' + last_trade_price + '€ ' +'  ' + e_ntf +' '+ lineprice +'€ '
                 updater.bot.send_message(chat_id=config["user_id"], text=msg)
-                #print('.......... Operation Up OK :' + linecurrency +" " + linealert + " " + last_trade_price + " >= " + lineprice)
+                #print('Operation Up OK :' + linecurrency +" " + linealert + " " + last_trade_price + " >= " + lineprice)
        
             
 ########### TIMER THREAD
