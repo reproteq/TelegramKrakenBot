@@ -131,9 +131,4 @@ Tested versions
 
   Skype: Reproteq 
 
-  Special thanks Endogen 🖖
-  
-  [![PyPI download total](https://img.shields.io/pypi/dt/ansicolortags.svg)](https://pypi.python.org/pypi/ansicolortags/)
-
-    
-  [![Github All Releases](https://img.shields.io/github/downloads/reproteq/TelegramKrakenBot/total.svg)]()
+  Special thanks Endogen 🖖   
