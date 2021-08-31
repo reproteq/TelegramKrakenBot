@@ -789,7 +789,11 @@ def FxFee(action, vol ,price):
 # all available funds will be used
 def trade_vol_all(update: Update, context: CallbackContext):
     chat_data = context.chat_data
-    
+    #TODOTT
+    #compruebaa formato si lleva xcoinzfiat si lo agrego para parchear funciones lo quitara si no lo dejara como  estaba, fix ada
+    t = jsoncoin(chat_data["one"])
+    chat_data["one"] = t
+
     update.message.reply_text(e_wit + "Calculating volume...")
     # Send request to Kraken to get current balance of all currencies
     res_balance = kraken_api("Balance", private=True)
@@ -838,7 +842,8 @@ def trade_vol_all(update: Update, context: CallbackContext):
 
     # SELL -----------------
     if chat_data["buysell"].upper() == KeyboardEnum.SELL.clean():
-        available_volume = res_balance["result"][chat_data["one"]]       
+        
+        available_volume = res_balance["result"][chat_data["one"]]        
 
         # Go through all open orders and check if sell-orders exists for the currency
         # If yes, subtract their volume from the available volume
@@ -1330,10 +1335,6 @@ def value_currency(update: Update, context: CallbackContext):
         
         #fix issue ada
         #asset = assets_in_pair(pair)
-        
-        print("----------pair--------------" + pair)
-        print("------last_price------------------" + last_price)
-
 
         value = float(0)
 
@@ -2205,11 +2206,30 @@ def init_cmd(update: Update, context: CallbackContext):
 def datetime_from_timestamp(unix_timestamp):
     return datetime.datetime.fromtimestamp(int(unix_timestamp)).strftime('%Y-%m-%d %H:%M:%S')
 
+# funcion compara tcoin con la lista de kraken si no esta es que se modifico para patch ada por lo tanto se agrego una xada y la quita
+def jsoncoin(tcoin):  
 
-#funcion para formatear nuevos pares
+    import urllib.request, json
+    url = 'https://api.kraken.com/0/public/Assets'
+    response = urllib.request.urlopen(url);
+    data = json.loads(response.read().decode("utf-8"))
+    
+    for i in data['result']:
+        #print(i)        
+        if tcoin == i:
+            t= tcoin
+            break
+        if tcoin == 'X'+i:
+            t = tcoin[1:]
+            break        
+    return t    
+        
+#funcion para formatear nuevos pares con len max 6
+#todo podria hacer que la funcion usara para mas len
+#TODOTT
 def krakenPair(strapi):
     #XXBTZEUR
-    #ADAEUR
+    #ADAEUR  
     lstrapi = len(strapi)
     if lstrapi == 6:
         
@@ -2332,6 +2352,7 @@ def min_order_size():
 # Returns a pre compiled Regex pattern to ignore case
 def comp(pattern):
     return re.compile(pattern, re.IGNORECASE)
+
 
 
 # Returns regex representation of OR for all coins in config 'used_pairs'
