@@ -11,7 +11,7 @@
 
 > #### Functions
 
-  - Trading   ( ❗ # No autotrade , No strategies, Only virtual assistant for easy and fast trade❗ )
+  - Trading   ❗Important, No autotrade with strategies or others, THis bot is  Only virtual assistant for easy and fast trade❗
   - Buy
   - Sell
   - Orders 
