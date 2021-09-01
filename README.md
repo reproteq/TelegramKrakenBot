@@ -1,4 +1,4 @@
-# TelegramKrakenBot 
+# Telegram Kraken Bot 
 ---
 ## Python3 Telegram Bot For Easy & Fast Trade in Kraken platform 🤖 💱 🚀
 
