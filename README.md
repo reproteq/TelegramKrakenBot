@@ -2,6 +2,8 @@
 ---
 ## Python3 Telegram Bot For Trading in Kraken exchange
 
+### ❗ Important, No autotrade with strategies or others, This bot is only virtual assistant for easy and fast trade ❗
+
 ![alt tag](https://github.com/reproteq/TelegramKrakenBot/blob/main/TelegramKrakenBot.gif) 
 
 
@@ -10,7 +12,7 @@
 ---
 
 > #### Functions
-  ### ❗ Important, No autotrade with strategies or others, This bot is only virtual assistant for easy and fast trade ❗
+ 
   - Trading
   - Buy
   - Sell
