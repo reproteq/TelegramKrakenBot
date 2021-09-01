@@ -2114,24 +2114,25 @@ def init_cmd(update: Update, context: CallbackContext):
     cmds = "/initialize - retry again\n/shutdown - shut down the bot"
 
     # Show ttcode message
-    msg = e_bot + 'Telegram Trade Bot v2 \n ' + e_pyt + 'Pure Python \n ' + e_nin  + 'Author: TT \n' + e_cal + ' 25-08-2021'
-    updater.bot.send_message(uid, msg, disable_notification=True, reply_markup=ReplyKeyboardRemove())
+    msg = e_bot + 'Telegram Kraken Bot \n ' + e_pyt + 'Pure Python \n ' + e_nin  + 'Author: TT \n' + e_cal + ' 25-08-2021'
+    #updater.bot.send_message(uid, text=italic(msg), parse_mode=ParseMode.MARKDOWN, disable_notification=True, reply_markup=ReplyKeyboardRemove())
+    updater.bot.send_message(uid, text=bold(msg), parse_mode=ParseMode.MARKDOWN, disable_notification=True, reply_markup=ReplyKeyboardRemove())
 
     # Show start up message
     msg = e_bgn + "Preparing Kraken-Bot"
-    updater.bot.send_message(uid, msg, disable_notification=True, reply_markup=ReplyKeyboardRemove())
+    updater.bot.send_message(uid, text=italic(msg), parse_mode=ParseMode.MARKDOWN, disable_notification=True, reply_markup=ReplyKeyboardRemove())
 
     # Assets -----------------
 
     msg = e_wit + "Reading assets..."
-    m = updater.bot.send_message(uid, msg, disable_notification=True)
+    m = updater.bot.send_message(uid, text=italic(msg), parse_mode=ParseMode.MARKDOWN, disable_notification=True)
 
     res_assets = kraken_api("Assets")
 
     # If Kraken replied with an error, show it
     if res_assets["error"]:
         msg = e_fld + "Reading assets... FAILED\n" + cmds
-        updater.bot.edit_message_text(msg, chat_id=uid, message_id=m.message_id)
+        updater.bot.edit_message_text(text=italic(msg), parse_mode=ParseMode.MARKDOWN, chat_id=uid, message_id=m.message_id)
 
         error = btfy(res_assets["error"][0])
         updater.bot.send_message(uid, error)
@@ -2143,19 +2144,19 @@ def init_cmd(update: Update, context: CallbackContext):
     assets = res_assets["result"]
 
     msg = e_dne + "Reading assets... DONE"
-    updater.bot.edit_message_text(msg, chat_id=uid, message_id=m.message_id)
+    updater.bot.edit_message_text(text=italic(msg), parse_mode=ParseMode.MARKDOWN, chat_id=uid, message_id=m.message_id)
 
     # Asset pairs -----------------
 
     msg = e_wit + "Reading asset pairs..."
-    m = updater.bot.send_message(uid, msg, disable_notification=True)
+    m = updater.bot.send_message(uid, text=italic(msg), parse_mode=ParseMode.MARKDOWN, disable_notification=True)
 
     res_pairs = kraken_api("AssetPairs")
 
     # If Kraken replied with an error, show it
     if res_pairs["error"]:
         msg = e_fld + "Reading asset pairs... FAILED\n" + cmds
-        updater.bot.edit_message_text(msg, chat_id=uid, message_id=m.message_id)
+        updater.bot.edit_message_text(text=italic(msg), parse_mode=ParseMode.MARKDOWN, chat_id=uid, message_id=m.message_id)
 
         error = btfy(res_pairs["error"][0])
         updater.bot.send_message(uid, error)
@@ -2163,19 +2164,19 @@ def init_cmd(update: Update, context: CallbackContext):
         return
 
     msg = e_dne + "Reading asset pairs... DONE"
-    updater.bot.edit_message_text(msg, chat_id=uid, message_id=m.message_id)
+    updater.bot.edit_message_text(text=italic(msg), parse_mode=ParseMode.MARKDOWN, chat_id=uid, message_id=m.message_id)
 
     # Order limits -----------------
 
     msg = e_wit + "Reading order limits..."
-    m = updater.bot.send_message(uid, msg, disable_notification=True)
+    m = updater.bot.send_message(uid, text=italic(msg), parse_mode=ParseMode.MARKDOWN, disable_notification=True)
 
     # Save order limits in global variable
     global limits
     limits = min_order_size()
 
     msg = e_dne + "Reading order limits... DONE"
-    updater.bot.edit_message_text(msg, chat_id=uid, message_id=m.message_id)
+    updater.bot.edit_message_text(text=italic(msg), parse_mode=ParseMode.MARKDOWN, chat_id=uid, message_id=m.message_id)
 
     # Sanity check -----------------
 
@@ -2187,19 +2188,19 @@ def init_cmd(update: Update, context: CallbackContext):
     sane, parameter = is_conf_sane(res_pairs["result"])
     if not sane:
         msg = e_fld + "Checking sanity... FAILED\n/shutdown - shut down the bot"
-        updater.bot.edit_message_text(msg, chat_id=uid, message_id=m.message_id)
+        updater.bot.edit_message_text(text=italic(msg), parse_mode=ParseMode.MARKDOWN, chat_id=uid, message_id=m.message_id)
 
         msg = e_err + "Wrong configuration: " + parameter
-        updater.bot.send_message(uid, msg)
+        updater.bot.send_message(uid, text=italic(msg), parse_mode=ParseMode.MARKDOWN)
         return
 
     msg = e_dne + "Checking sanity... DONE"
-    updater.bot.edit_message_text(msg, chat_id=uid, message_id=m.message_id)
+    updater.bot.edit_message_text(text=italic(msg), parse_mode=ParseMode.MARKDOWN, chat_id=uid, message_id=m.message_id)
 
     # Bot is ready -----------------
 
-    msg = e_rok + " Telegram Trade Bot v2  is ready ! " + e_fie
-    updater.bot.send_message(uid, msg, reply_markup=keyboard_cmds())
+    msg = e_rok + " Telegram Kraken Bot is ready ! " + e_fie
+    updater.bot.send_message(uid, text=italic(msg), parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard_cmds())
 
 
 # Converts a Unix timestamp to a data-time object with format 'Y-m-d H:M:S'
@@ -2286,6 +2287,10 @@ def trim_zeros(value_to_trim, decimals=config["decimals"]):
 # Will make the text bold if used with Markdown
 def bold(text):
     return "*" + text + "*"
+
+
+def italic(text):
+    return "_" + text + "_"
 
 
 # Beautifies Kraken error messages
