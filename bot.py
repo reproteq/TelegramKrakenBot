@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import re,os,sys,json,time,inspect,logging,datetime, threading, requests, krakenex, telegram, jsonlines
+import re,os,sys,json,time,inspect,logging,datetime, threading, requests, krakenex, telegram, jsonlines, urllib.request
 from bs4 import BeautifulSoup
 from telegram import KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode ,Update
 from telegram.ext import Updater, CommandHandler, ConversationHandler, RegexHandler, MessageHandler, CallbackContext
@@ -2209,7 +2209,6 @@ def datetime_from_timestamp(unix_timestamp):
 # funcion compara tcoin con la lista de kraken si no esta es que se modifico para patch ada por lo tanto se agrego una xada y la quita
 def jsoncoin(tcoin):  
 
-    import urllib.request, json
     url = 'https://api.kraken.com/0/public/Assets'
     response = urllib.request.urlopen(url);
     data = json.loads(response.read().decode("utf-8"))
