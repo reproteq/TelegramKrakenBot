@@ -11,7 +11,7 @@
 
 > #### Functions
 
-  - Trading
+  - Trading ( ❗ No autotrade , not strategies, only virtual assistant ❗ )
   - Buy
   - Sell
   - Orders 
