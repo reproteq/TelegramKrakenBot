@@ -123,7 +123,7 @@ def restrict_access(func):
 #todo balance con precio
 @restrict_access
 def balance_cmd(update: Update, context: CallbackContext):
-    update.message.reply_text(e_wit + "Retrieving "+ e_sac + "balance..." )
+    update.message.reply_text(e_wit + italic("Retrieving balance ..." ), parse_mode=ParseMode.MARKDOWN)
     res_balance = kraken_api("Balance", private=True)
     if handle_api_error(res_balance, update):
         return
@@ -286,7 +286,9 @@ def alert_new_remove_all(update: Update, context: CallbackContext):
 def alert_currency(update: Update, context: CallbackContext):
     chat_data = context.chat_data
     chat_data["currency"] = update.message.text.upper()
-    asset_one, asset_two = assets_in_pair(pairs[chat_data["currency"]])
+    # ttcode fix for ADAEUR pair convert 6len to standard 8len XADAZEUR XcurrencyZfiat
+    #asset_one, asset_two = assets_in_pair(pairs[chat_data["currency"]]) #ori   
+    asset_one, asset_two = assets_in_pair2(pairs[chat_data["currency"]])
     chat_data["one"] = asset_one
     chat_data["two"] = asset_two
     cancel_btn = [KeyboardButton(KeyboardEnum.CANCEL.clean())]
@@ -344,7 +346,7 @@ def alert_confirm(update: Update, context: CallbackContext):
 ######### ALERTS
 @restrict_access
 def alerts_cmd(update: Update, context: CallbackContext):    
-    update.message.reply_text(e_wit + "Retrieving alerts...")
+    update.message.reply_text(e_wit + italic("Retrieving alerts ..."), parse_mode=ParseMode.MARKDOWN)
     file_path = "alerts.json"  
     filesize = os.path.getsize(file_path) 
     # Reset global orders list
@@ -671,11 +673,11 @@ def trade_sell_all_confirm(update: Update, context: CallbackContext):
 def trade_currency(update: Update, context: CallbackContext): 
     
     chat_data = context.chat_data
-    chat_data["currency"] = update.message.text.upper()        
-    #ttcode patch check len para ver si es nuevo formato       
-    #balance_asset =  krakenPair(balance_asset)
-        
-    asset_one, asset_two = assets_in_pair(pairs[chat_data["currency"]])
+    chat_data["currency"] = update.message.text.upper()         
+    #balance_asset =  pairAddXZ(balance_asset)
+    # ttcode fix for ADAEUR pair convert 6len to standard 8len XADAZEUR XcurrencyZfiat
+    asset_one, asset_two = assets_in_pair(pairs[chat_data["currency"]])#ori
+    asset_one, asset_two = assets_in_pair2(pairs[chat_data["currency"]])
     chat_data["one"] = asset_one
     chat_data["two"] = asset_two
 
@@ -791,7 +793,7 @@ def trade_vol_all(update: Update, context: CallbackContext):
     chat_data = context.chat_data
     #TODOTT
     #compruebaa formato si lleva xcoinzfiat si lo agrego para parchear funciones lo quitara si no lo dejara como  estaba, fix ada
-    t = jsoncoin(chat_data["one"])
+    t = pairSubXZ(chat_data["one"])
     chat_data["one"] = t
 
     update.message.reply_text(e_wit + "Calculating volume...")
@@ -945,7 +947,7 @@ def trade_show_conf(update: Update, context: CallbackContext):
 
     # Generate trade string to show at confirmation
     if chat_data["market_price"]:
-        update.message.reply_text(e_wit + "Retrieving estimated price...")
+        update.message.reply_text(e_wit + italic("Retrieving estimated price ..."), parse_mode=ParseMode.MARKDOWN)
 
         # Send request to Kraken to get current trading price for pair
         res_data = kraken_api("Ticker", data={"pair": pairs[chat_data["currency"]]}, private=False)
@@ -1063,7 +1065,7 @@ def trade_confirm(update: Update, context: CallbackContext):
 # Show and manage orders
 @restrict_access
 def orders_cmd(update: Update, context: CallbackContext):
-    update.message.reply_text(e_wit + "Retrieving orders...")
+    update.message.reply_text(e_wit + italic("Retrieving orders ..."), parse_mode=ParseMode.MARKDOWN)
 
     # Send request to Kraken to get open orders
     res_data = kraken_api("OpenOrders", private=True)
@@ -1194,7 +1196,7 @@ def orders_close_order(update: Update, context: CallbackContext):
 def price_cmd(update: Update, context: CallbackContext):
     # If single-price option is active, get prices for all coins
     if config["single_price"]:
-        update.message.reply_text(e_wit + "Retrieving prices...")
+        update.message.reply_text(e_wit + italic("Retrieving prices ..."), parse_mode=ParseMode.MARKDOWN)
 
         req_data = dict()
         req_data["pair"] = str()
@@ -1218,7 +1220,8 @@ def price_cmd(update: Update, context: CallbackContext):
         for pair, data in res_data["result"].items():
             last_trade_price = trim_zeros(data["c"][0])
             coin = list(pairs.keys())[list(pairs.values()).index(pair)]
-            msg += coin + ": " + last_trade_price + " " + config["used_pairs"][coin] + "\n"
+            r_last_trade_price = str(round(float(last_trade_price),2))
+            msg += coin + ": " + r_last_trade_price + " " + config["used_pairs"][coin] + "\n"
 
         update.message.reply_text(bold(msg), parse_mode=ParseMode.MARKDOWN)
 
@@ -1241,7 +1244,7 @@ def price_cmd(update: Update, context: CallbackContext):
 
 # Choose for which currency to show the last trade price
 def price_currency(update: Update, context: CallbackContext):
-    update.message.reply_text(e_wit + "Retrieving price...")
+    update.message.reply_text(e_wit + italic("Retrieving price ..."), parse_mode=ParseMode.MARKDOWN)
 
     currency = update.message.text.upper()
     req_data = {"pair": pairs[currency]}
@@ -1280,7 +1283,7 @@ def value_cmd(update: Update, context: CallbackContext):
 
 # Choose for which currency you want to know the current value
 def value_currency(update: Update, context: CallbackContext):
-    update.message.reply_text(e_wit + "Retrieving current value...")
+    update.message.reply_text(e_wit + italic("Retrieving current value ..."), parse_mode=ParseMode.MARKDOWN)
 
     # ALL COINS (balance of all coins)
     if update.message.text.upper() == KeyboardEnum.ALL.clean():
@@ -1388,7 +1391,7 @@ def reload_cmd(update: Update, context: CallbackContext):
 # Is it under maintenance or functional?
 @restrict_access
 def state_cmd(update: Update, context: CallbackContext):
-    update.message.reply_text(e_wit + "Retrieving API state...")
+    update.message.reply_text(e_wit + italic("Retrieving API state ..."), parse_mode=ParseMode.MARKDOWN)
 
     msg = "Kraken API Status: " + bold(api_state()) + "\nhttps://status.kraken.com"
     updater.bot.send_message(config["user_id"],
@@ -1405,13 +1408,17 @@ def start_cmd(update: Update, context: CallbackContext):
     update.message.reply_text(msg, reply_markup=keyboard_cmds())
 
 
+
 # Returns a string representation of a trade. Looks like this:
 # sell 0.03752345 ETH-EUR @ limit 267.5 on 2017-08-22 22:18:22
 def get_trade_str(trade):
-    from_asset, to_asset = assets_in_pair(trade["pair"])
+    from_asset, to_asset = assets_in_pair(trade["pair"])    
 
     if from_asset and to_asset:
         # Build string representation of trade with asset names
+        #TODOTT ISSUE XADA
+        
+
         trade_str = (trade["type"] + " " +
                      trim_zeros(trade["vol"]) + " " +
                      assets[from_asset]["altname"] + " @ " +
@@ -1433,7 +1440,7 @@ def get_trade_str(trade):
 # Shows executed trades with volume and price
 @restrict_access
 def trades_cmd(update: Update, context: CallbackContext):
-    update.message.reply_text(e_wit + "Retrieving executed trades...")
+    update.message.reply_text(e_wit + italic("Retrieving executed trades ..."), parse_mode=ParseMode.MARKDOWN)
 
     # Send request to Kraken to get trades history
     res_trades = kraken_api("TradesHistory", private=True)
@@ -1462,8 +1469,9 @@ def trades_cmd(update: Update, context: CallbackContext):
         # Get number of first items in list (latest trades)
         for items in range(config["history_items"]):
             newest_trade = next(iter(trades), None)
-
-            _, two = assets_in_pair(newest_trade["pair"])
+            # ttcode fix for ADAEUR pair convert 6len to standard 8len XADAZEUR XcurrencyZfiat            
+            #_, two = assets_in_pair(newest_trade["pair"])#  ori
+            _, two = assets_in_pair2(newest_trade["pair"])
 
             # It's a fiat currency
             if two.startswith("Z"):
@@ -1656,7 +1664,7 @@ def funding_currency(update: Update, context: CallbackContext):
 # Get wallet addresses to deposit to
 def funding_deposit(update: Update, context: CallbackContext):
     chat_data = context.chat_data
-    update.message.reply_text(e_wit + "Retrieving wallets to deposit...")
+    update.message.reply_text(e_wit + italic("Retrieving wallets to deposit ..."), parse_mode=ParseMode.MARKDOWN)
 
     req_data = dict()
     req_data["asset"] = chat_data["currency"]
@@ -2207,9 +2215,10 @@ def init_cmd(update: Update, context: CallbackContext):
 def datetime_from_timestamp(unix_timestamp):
     return datetime.datetime.fromtimestamp(int(unix_timestamp)).strftime('%Y-%m-%d %H:%M:%S')
 
-# funcion compara tcoin con la lista de kraken si no esta es que se modifico para patch ada por lo tanto se agrego una xada y la quita
-def jsoncoin(tcoin):  
 
+# funcion compara tcoin con la lista de kraken si no esta es que se modifico para patch ada por lo tanto se agrego una xada y la quita
+# ttcode fix for ADAEUR pair convert 6len to standard 8len XADAZEUR XcurrencyZfiat
+def pairSubXZ(tcoin):
     url = 'https://api.kraken.com/0/public/Assets'
     response = urllib.request.urlopen(url);
     data = json.loads(response.read().decode("utf-8"))
@@ -2221,35 +2230,28 @@ def jsoncoin(tcoin):
             break
         if tcoin == 'X'+i:
             t = tcoin[1:]
-            break        
+            break
+        if tcoin == 'Z'+i:
+            t = tcoin[1:]
+            break          
     return t    
-        
-#funcion para formatear nuevos pares con len max 6
-#todo podria hacer que la funcion usara para mas len
-#TODOTT
-def krakenPair(strapi):
-    #XXBTZEUR
-    #ADAEUR  
+
+
+# ttcode fix for ADAEUR pair convert 6len to standard 8len XADAZEUR XcurrencyZfiat
+def pairAddXZ(strapi):
+    #XXBTZEUR   #ADAEUR  
     lstrapi = len(strapi)
-    if lstrapi == 6:
-        
+    if lstrapi == 6:       
         part1 = strapi[0:3]
         part2 = strapi[3:6]
-        res = 'X' + part1 + 'Z' +  part2      
-
-
+        res = 'X' + part1 + 'Z' +  part2   
     else:
         res = strapi
     return res
 
 
-# From pair string (XXBTZEUR) get from-asset (XXBT) and to-asset (ZEUR)
-# fix issue if new format example (ADAEUR) 6 len or old format 
-def assets_in_pair(pair):
-    
-    #chek long pair forknow format and fix kraken pair 6len or 8 len pair string (XXBTZEUR)
-    pair = krakenPair(pair)    
-    
+
+def assets_in_pair(pair):      
     for asset, _ in assets.items():
         # If TRUE, we know that 'to_asset' exists in assets
         if pair.endswith(asset):
@@ -2261,11 +2263,33 @@ def assets_in_pair(pair):
                 return from_asset, to_asset
             else:
                 #fix forada and other 6len
+                return None, to_asset #ori
+                #return from_asset, to_asset
+
+    return None, None
+
+# ttcode fix for ADAEUR pair convert 6len to standard 8len XADAZEUR XcurrencyZfiat
+# From pair string (XXBTZEUR) get from-asset (XXBT) and to-asset (ZEUR)
+def assets_in_pair2(pair):
+    
+    #chek long pair forknow format and fix kraken pair 6len or 8 len pair string (XXBTZEUR)
+    pair = pairAddXZ(pair)    
+    
+    for asset, _ in assets.items():
+        # If TRUE, we know that 'to_asset' exists in assets
+        if pair.endswith(asset):
+            from_asset = pair[:len(asset)]
+            to_asset = pair[len(pair)-len(asset):]
+
+            # If TRUE, we know that 'from_asset' exists in assets
+            if from_asset in assets:
+                return from_asset, to_asset
+            else:
+                #fix for ada and other 6len pairs
                 #return None, to_asset #ori
                 return from_asset, to_asset
 
     return None, None
-
 
 # Remove trailing zeros and cut decimal places to get clean values
 def trim_zeros(value_to_trim, decimals=config["decimals"]):
