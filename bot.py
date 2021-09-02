@@ -676,7 +676,7 @@ def trade_currency(update: Update, context: CallbackContext):
     chat_data["currency"] = update.message.text.upper()         
     #balance_asset =  pairAddXZ(balance_asset)
     # ttcode fix for ADAEUR pair convert 6len to standard 8len XADAZEUR XcurrencyZfiat
-    asset_one, asset_two = assets_in_pair(pairs[chat_data["currency"]])#ori
+    #asset_one, asset_two = assets_in_pair(pairs[chat_data["currency"]])#ori
     asset_one, asset_two = assets_in_pair2(pairs[chat_data["currency"]])
     chat_data["one"] = asset_one
     chat_data["two"] = asset_two
