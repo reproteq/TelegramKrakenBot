@@ -2430,20 +2430,20 @@ funding_handler = ConversationHandler(
     entry_points=[CommandHandler('funding', funding_cmd)],
     states={
         WorkflowEnum.FUNDING_CURRENCY:
-            [RegexHandler(comp("^(" + regex_coin_or() + ")$"), funding_currency, pass_chat_data=True),
-             RegexHandler(comp("^(CANCEL)$"), cancel, pass_chat_data=True)],
+            [MessageHandler(Filters.regex("^(" + regex_coin_or() + ")$"), funding_currency, pass_chat_data=True),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)],
         WorkflowEnum.FUNDING_CHOOSE:
-            [RegexHandler(comp("^(DEPOSIT)$"), funding_deposit, pass_chat_data=True),
-             RegexHandler(comp("^(WITHDRAW)$"), funding_withdraw),
-             RegexHandler(comp("^(CANCEL)$"), cancel, pass_chat_data=True)],
+            [MessageHandler(Filters.regex("^(DEPOSIT)$"), funding_deposit, pass_chat_data=True),
+             MessageHandler(Filters.regex("^(WITHDRAW)$"), funding_withdraw),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)],
         WorkflowEnum.WITHDRAW_WALLET:
             [MessageHandler(Filters.text, funding_withdraw_wallet, pass_chat_data=True)],
         WorkflowEnum.WITHDRAW_VOLUME:
             [MessageHandler(Filters.text, funding_withdraw_volume, pass_chat_data=True)],
         WorkflowEnum.WITHDRAW_CONFIRM:
-            [RegexHandler(comp("^(YES|NO)$"), funding_withdraw_confirm, pass_chat_data=True)]
+            [MessageHandler(Filters.regex("^(YES|NO)$"), funding_withdraw_confirm, pass_chat_data=True)]
     },
-    fallbacks=[CommandHandler('cancel', cancel, pass_chat_data=True)],
+    fallbacks=[MessageHandler(Filters.regex(' cancel'), cancel, pass_chat_data=True)],
     allow_reentry=True)
 dispatcher.add_handler(funding_handler)
 
@@ -2453,10 +2453,10 @@ trades_handler = ConversationHandler(
     entry_points=[CommandHandler('trades', trades_cmd)],
     states={
         WorkflowEnum.TRADES_NEXT:
-            [RegexHandler(comp("^(NEXT)$"), trades_next),
-             RegexHandler(comp("^(CANCEL)$"), cancel)]
+            [MessageHandler(Filters.regex("^(NEXT)$"), trades_next),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel)]
     },
-    fallbacks=[CommandHandler('cancel', cancel)],
+    fallbacks=[MessageHandler(Filters.regex('cancel'), cancel)],
     allow_reentry=True)
 dispatcher.add_handler(trades_handler)
 
@@ -2466,10 +2466,10 @@ chart_handler = ConversationHandler(
     entry_points=[CommandHandler('chart', chart_cmd)],
     states={
         WorkflowEnum.CHART_CURRENCY:
-            [RegexHandler(comp("^(" + regex_coin_or() + ")$"), chart_currency),
-             RegexHandler(comp("^(CANCEL)$"), cancel)]
+            [MessageHandler(Filters.regex("^(" + regex_coin_or() + ")$"), chart_currency),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel)]
     },
-    fallbacks=[CommandHandler('cancel', cancel)],
+    fallbacks=[MessageHandler(Filters.regex('cancel'), cancel)],
     allow_reentry=True)
 dispatcher.add_handler(chart_handler)
 
@@ -2479,14 +2479,14 @@ orders_handler = ConversationHandler(
     entry_points=[CommandHandler('orders', orders_cmd)],
     states={
         WorkflowEnum.ORDERS_CLOSE:
-            [RegexHandler(comp("^(CLOSE ORDER)$"), orders_choose_order),
-             RegexHandler(comp("^(CLOSE ALL)$"), orders_close_all),
-             RegexHandler(comp("^(CANCEL)$"), cancel)],
+            [MessageHandler(Filters.regex("^(CLOSE ORDER)$"), orders_choose_order),
+             MessageHandler(Filters.regex("^(CLOSE ALL)$"), orders_close_all),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel)],
         WorkflowEnum.ORDERS_CLOSE_ORDER:
-            [RegexHandler(comp("^(CANCEL)$"), cancel),
-             RegexHandler(comp("^[A-Z0-9]{6}-[A-Z0-9]{5}-[A-Z0-9]{6}$"), orders_close_order)]
+            [MessageHandler(Filters.regex("^(CANCEL)$"), cancel),
+             MessageHandler(Filters.regex("^[A-Z0-9]{6}-[A-Z0-9]{5}-[A-Z0-9]{6}$"), orders_close_order)]
     },
-    fallbacks=[CommandHandler('cancel', cancel)],
+    fallbacks=[MessageHandler(Filters.regex('cancel'), cancel)],
     allow_reentry=True)
 dispatcher.add_handler(orders_handler)
 
@@ -2497,15 +2497,15 @@ alerts_handler = ConversationHandler(
     states={
 
         WorkflowEnum.ALERTS_CLOSE:
-            [RegexHandler(comp("^(CLOSE ALERT)$"), alerts_choose_alert),
-             RegexHandler(comp("^(CLOSE ALL)$"), alerts_close_all),
-             RegexHandler(comp("^(CANCEL)$"), cancel)],
+            [MessageHandler(Filters.regex("^(CLOSE ALERT)$"), alerts_choose_alert),
+             MessageHandler(Filters.regex("^(CLOSE ALL)$"), alerts_close_all),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel)],
         WorkflowEnum.ALERTS_CLOSE_ALERT:
-            [RegexHandler(comp("^(CANCEL)$"), cancel),       
-             RegexHandler(comp("^.*$"), alerts_close_alert)]             
+            [MessageHandler(Filters.regex("^(CANCEL)$"), cancel),       
+             MessageHandler(Filters.regex("^.*$"), alerts_close_alert)]             
 
     },
-    fallbacks=[CommandHandler('cancel', cancel, pass_chat_data=True)],
+    fallbacks=[MessageHandler(Filters.regex('cancel'), cancel, pass_chat_data=True)],
     allow_reentry=True)
 dispatcher.add_handler(alerts_handler)
 
@@ -2515,21 +2515,21 @@ alert_handler = ConversationHandler(
     entry_points=[CommandHandler('alert', alert_cmd)],
     states={
         WorkflowEnum.ALERT_NEW_REMOVE_ALL:
-            [RegexHandler(comp("^(NEW ALERT UP|NEW ALERT DOWN|REMOVE ALL ALERTS|VIEW ALL ALERTS)$"), alert_new_remove_all, pass_chat_data=True),
-             RegexHandler(comp("^(CANCEL)$"), cancel, pass_chat_data=True)],
+            [MessageHandler(Filters.regex("^(NEW ALERT UP|NEW ALERT DOWN|REMOVE ALL ALERTS|VIEW ALL ALERTS)$"), alert_new_remove_all, pass_chat_data=True),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)],
         WorkflowEnum.ALERT_CURRENCY:
-            [RegexHandler(comp("^(" + regex_coin_or() + ")$"), alert_currency, pass_chat_data=True),
-             RegexHandler(comp("^(CANCEL)$"), cancel, pass_chat_data=True)],
+            [MessageHandler(Filters.regex("^(" + regex_coin_or() + ")$"), alert_currency, pass_chat_data=True),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)],
         WorkflowEnum.ALERT_PRICE:
-            [RegexHandler(comp("^((?=.*?\d)\d*[.,]?\d*)$"), alert_price, pass_chat_data=True),
-             RegexHandler(comp("^(YES|NO)$"), alert_price, pass_chat_data=True),
-             RegexHandler(comp("^(CANCEL)$"), cancel, pass_chat_data=True)],       
+            [MessageHandler(Filters.regex("^((?=.*?\d)\d*[.,]?\d*)$"), alert_price, pass_chat_data=True),
+             MessageHandler(Filters.regex("^(YES|NO)$"), alert_price, pass_chat_data=True),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)],       
         WorkflowEnum.ALERT_CONFIRM:
-            [RegexHandler(comp("^(YES|NO)$"), alert_confirm, pass_chat_data=True),
-             RegexHandler(comp("^(CANCEL)$"), cancel, pass_chat_data=True)]            
+            [MessageHandler(Filters.regex("^(YES|NO)$"), alert_confirm, pass_chat_data=True),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)]            
 
     },
-    fallbacks=[CommandHandler('cancel', cancel, pass_chat_data=True)],
+    fallbacks=[MessageHandler(Filters.regex('cancel'), cancel, pass_chat_data=True)],
     allow_reentry=True)
 dispatcher.add_handler(alert_handler)
 
@@ -2540,13 +2540,13 @@ alerton_handler = ConversationHandler(
     entry_points=[CommandHandler('alerton', alerton_cmd)],
     states={
         WorkflowEnum.ALERTON_OK:
-            [RegexHandler(comp("^(YES|NO)$"), alerton_chek , pass_chat_data=True),             
-             RegexHandler(comp("^(CANCEL)$"), cancel, pass_chat_data=True)],
+            [MessageHandler(Filters.regex("^(YES|NO)$"), alerton_chek , pass_chat_data=True),             
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)],
         WorkflowEnum.ALERTON_CHEK:
-            [RegexHandler(comp("^(YES|NO)$"), alerton_chek , pass_chat_data=True),             
-             RegexHandler(comp("^(CANCEL)$"), cancel, pass_chat_data=True)]             
+            [MessageHandler(Filters.regex("^(YES|NO)$"), alerton_chek , pass_chat_data=True),             
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)]             
     },
-    fallbacks=[CommandHandler('cancel', cancel, pass_chat_data=True)],
+    fallbacks=[MessageHandler(Filters.regex('cancel'), cancel, pass_chat_data=True)],
     allow_reentry=True)
 dispatcher.add_handler(alerton_handler)
 
@@ -2555,32 +2555,32 @@ trade_handler = ConversationHandler(
     entry_points=[CommandHandler('trade', trade_cmd)],
     states={
         WorkflowEnum.TRADE_BUY_SELL:
-            [RegexHandler(comp("^(BUY|SELL)$"), trade_buy_sell, pass_chat_data=True),
-             RegexHandler(comp("^(CANCEL)$"), cancel, pass_chat_data=True)],
+            [MessageHandler(Filters.regex("^(BUY|SELL)$"), trade_buy_sell, pass_chat_data=True),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)],
         WorkflowEnum.TRADE_CURRENCY:
-            [RegexHandler(comp("^(" + regex_coin_or() + ")$"), trade_currency, pass_chat_data=True),
-             RegexHandler(comp("^(CANCEL)$"), cancel, pass_chat_data=True),
-             RegexHandler(comp("^(ALL)$"), trade_sell_all)],
+            [MessageHandler(Filters.regex("^(" + regex_coin_or() + ")$"), trade_currency, pass_chat_data=True),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True),
+             MessageHandler(Filters.regex("^(ALL)$"), trade_sell_all)],
         WorkflowEnum.TRADE_SELL_ALL_CONFIRM:
-            [RegexHandler(comp("^(YES|NO)$"), trade_sell_all_confirm)],
+            [MessageHandler(Filters.regex("^(YES|NO)$"), trade_sell_all_confirm)],
         WorkflowEnum.TRADE_PRICE:
-            [RegexHandler(comp("^((?=.*?\d)\d*[.,]?\d*|MARKET PRICE)$"), trade_price, pass_chat_data=True),
-             RegexHandler(comp("^(CANCEL)$"), cancel, pass_chat_data=True)],
+            [MessageHandler(Filters.regex("^((?=.*?\d)\d*[.,]?\d*|MARKET PRICE)$"), trade_price, pass_chat_data=True),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)],
         WorkflowEnum.TRADE_VOL_TYPE:
-            [RegexHandler(comp("^(" + regex_asset_or() + ")$"), trade_vol_asset, pass_chat_data=True),
-             RegexHandler(comp("^(VOLUME)$"), trade_vol_volume, pass_chat_data=True),
-             RegexHandler(comp("^(ALL)$"), trade_vol_all, pass_chat_data=True),
-             RegexHandler(comp("^(CANCEL)$"), cancel, pass_chat_data=True)],
+            [MessageHandler(Filters.regex("^(" + regex_asset_or() + ")$"), trade_vol_asset, pass_chat_data=True),
+             MessageHandler(Filters.regex("^(VOLUME)$"), trade_vol_volume, pass_chat_data=True),
+             MessageHandler(Filters.regex("^(ALL)$"), trade_vol_all, pass_chat_data=True),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)],
         WorkflowEnum.TRADE_VOLUME:
-            [RegexHandler(comp("^^(?=.*?\d)\d*[.,]?\d*$"), trade_volume, pass_chat_data=True),
-             RegexHandler(comp("^(CANCEL)$"), cancel, pass_chat_data=True)],
+            [MessageHandler(Filters.regex("^^(?=.*?\d)\d*[.,]?\d*$"), trade_volume, pass_chat_data=True),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)],
         WorkflowEnum.TRADE_VOLUME_ASSET:
-            [RegexHandler(comp("^^(?=.*?\d)\d*[.,]?\d*$"), trade_volume_asset, pass_chat_data=True),
-             RegexHandler(comp("^(CANCEL)$"), cancel, pass_chat_data=True)],
+            [MessageHandler(Filters.regex("^^(?=.*?\d)\d*[.,]?\d*$"), trade_volume_asset, pass_chat_data=True),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)],
         WorkflowEnum.TRADE_CONFIRM:
-            [RegexHandler(comp("^(YES|NO)$"), trade_confirm, pass_chat_data=True)]
+            [MessageHandler(Filters.regex("^(YES|NO)$"), trade_confirm, pass_chat_data=True)]
     },
-    fallbacks=[CommandHandler('cancel', cancel, pass_chat_data=True)],
+    fallbacks=[MessageHandler(Filters.regex(' cancel'), cancel, pass_chat_data=True)],
     allow_reentry=True)
 dispatcher.add_handler(trade_handler)
 
@@ -2590,10 +2590,10 @@ price_handler = ConversationHandler(
     entry_points=[CommandHandler('price', price_cmd)],
     states={
         WorkflowEnum.PRICE_CURRENCY:
-            [RegexHandler(comp("^(" + regex_coin_or() + ")$"), price_currency),
-             RegexHandler(comp("^(CANCEL)$"), cancel)]
+            [MessageHandler(Filters.regex("^(" + regex_coin_or() + ")$"), price_currency),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel)]
     },
-    fallbacks=[CommandHandler('cancel', cancel)],
+    fallbacks=[MessageHandler(Filters.regex(' cancel'), cancel)],
     allow_reentry=True)
 dispatcher.add_handler(price_handler)
 
@@ -2603,17 +2603,17 @@ value_handler = ConversationHandler(
     entry_points=[CommandHandler('value', value_cmd)],
     states={
         WorkflowEnum.VALUE_CURRENCY:
-            [RegexHandler(comp("^(" + regex_coin_or() + "|ALL)$"), value_currency),
-             RegexHandler(comp("^(CANCEL)$"), cancel)]
+            [MessageHandler(Filters.regex("^(" + regex_coin_or() + "|ALL)$"), value_currency),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel)]
     },
-    fallbacks=[CommandHandler('cancel', cancel)],
+    fallbacks=[MessageHandler(Filters.regex(' cancel'), cancel)],
     allow_reentry=True)
 dispatcher.add_handler(value_handler)
 
 def settings_change_state():
     return [WorkflowEnum.SETTINGS_CHANGE,
-            [RegexHandler(comp("^(" + regex_settings_or() + ")$"), settings_change, pass_chat_data=True),
-             RegexHandler(comp("^(CANCEL)$"), cancel, pass_chat_data=True)]]
+            [MessageHandler(Filters.regex("^(" + regex_settings_or() + ")$"), settings_change, pass_chat_data=True),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)]]
 
 def settings_save_state():
     return [WorkflowEnum.SETTINGS_SAVE,
@@ -2621,7 +2621,7 @@ def settings_save_state():
 
 def settings_confirm_state():
     return [WorkflowEnum.SETTINGS_CONFIRM,
-            [RegexHandler(comp("^(YES|NO)$"), settings_confirm, pass_chat_data=True)]]
+            [MessageHandler(Filters.regex("^(YES|NO)$"), settings_confirm, pass_chat_data=True)]]
 
 
 # BOT conversation handler
@@ -2629,15 +2629,15 @@ bot_handler = ConversationHandler(
     entry_points=[CommandHandler('bot', bot_cmd)],
     states={
         WorkflowEnum.BOT_SUB_CMD:
-            [RegexHandler(comp("^(UPDATE CHECK|UPDATE|RESTART|SHUTDOWN)$"), bot_sub_cmd),
-             RegexHandler(comp("^(API STATE)$"), state_cmd),
-             RegexHandler(comp("^(SETTINGS)$"), settings_cmd),
-             RegexHandler(comp("^(CANCEL)$"), cancel)],
+            [MessageHandler(Filters.regex("^(UPDATE CHECK|UPDATE|RESTART|SHUTDOWN)$"), bot_sub_cmd),
+             MessageHandler(Filters.regex("^(API STATE)$"), state_cmd),
+             MessageHandler(Filters.regex("^(SETTINGS)$"), settings_cmd),
+             MessageHandler(Filters.regex("^(CANCEL)$"), cancel)],
         settings_change_state()[0]: settings_change_state()[1],
         settings_save_state()[0]: settings_save_state()[1],
         settings_confirm_state()[0]: settings_confirm_state()[1]
     },
-    fallbacks=[CommandHandler('cancel', cancel)],
+    fallbacks=[MessageHandler(Filters.regex(' cancel'), cancel)],
     allow_reentry=True)
 dispatcher.add_handler(bot_handler)
 
@@ -2650,7 +2650,7 @@ settings_handler = ConversationHandler(
         settings_save_state()[0]: settings_save_state()[1],
         settings_confirm_state()[0]: settings_confirm_state()[1]
     },
-    fallbacks=[CommandHandler('cancel', cancel)],
+    fallbacks=[MessageHandler(Filters.regex(' cancel'), cancel)],
     allow_reentry=True)
 dispatcher.add_handler(settings_handler)
 
