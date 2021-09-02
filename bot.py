@@ -287,8 +287,9 @@ def alert_currency(update: Update, context: CallbackContext):
     chat_data = context.chat_data
     chat_data["currency"] = update.message.text.upper()
     # ttcode fix for ADAEUR pair convert 6len to standard 8len XADAZEUR XcurrencyZfiat
-    #asset_one, asset_two = assets_in_pair(pairs[chat_data["currency"]]) #ori   
-    asset_one, asset_two = assets_in_pair2(pairs[chat_data["currency"]])
+    #asset_one, asset_two = assets_in_pair(pairs[chat_data["currency"]]) #ori
+    
+    asset_one, asset_two = assets_in_pair(pairAddXZ(pairs[chat_data["currency"]]))
     chat_data["one"] = asset_one
     chat_data["two"] = asset_two
     cancel_btn = [KeyboardButton(KeyboardEnum.CANCEL.clean())]
@@ -677,7 +678,7 @@ def trade_currency(update: Update, context: CallbackContext):
     #balance_asset =  pairAddXZ(balance_asset)
     # ttcode fix for ADAEUR pair convert 6len to standard 8len XADAZEUR XcurrencyZfiat
     #asset_one, asset_two = assets_in_pair(pairs[chat_data["currency"]])#ori
-    asset_one, asset_two = assets_in_pair2(pairs[chat_data["currency"]])
+    asset_one, asset_two = assets_in_pair(pairAddXZ(pairs[chat_data["currency"]]))
     chat_data["one"] = asset_one
     chat_data["two"] = asset_two
 
@@ -1416,8 +1417,7 @@ def get_trade_str(trade):
 
     if from_asset and to_asset:
         # Build string representation of trade with asset names
-        #TODOTT ISSUE XADA
-        
+        #TODOTT ISSUE XADA       
 
         trade_str = (trade["type"] + " " +
                      trim_zeros(trade["vol"]) + " " +
@@ -1471,7 +1471,7 @@ def trades_cmd(update: Update, context: CallbackContext):
             newest_trade = next(iter(trades), None)
             # ttcode fix for ADAEUR pair convert 6len to standard 8len XADAZEUR XcurrencyZfiat            
             #_, two = assets_in_pair(newest_trade["pair"])#  ori
-            _, two = assets_in_pair2(newest_trade["pair"])
+            _, two = assets_in_pair(pairAddXZ(newest_trade["pair"]))
 
             # It's a fiat currency
             if two.startswith("Z"):
@@ -2216,44 +2216,39 @@ def datetime_from_timestamp(unix_timestamp):
     return datetime.datetime.fromtimestamp(int(unix_timestamp)).strftime('%Y-%m-%d %H:%M:%S')
 
 
+
 # funcion compara tcoin con la lista de kraken si no esta es que se modifico para patch ada por lo tanto se agrego una xada y la quita
 # ttcode fix for ADAEUR pair convert 6len to standard 8len XADAZEUR XcurrencyZfiat
-def pairSubXZ(tcoin):
-    url = 'https://api.kraken.com/0/public/Assets'
-    response = urllib.request.urlopen(url);
-    data = json.loads(response.read().decode("utf-8"))
-    
-    for i in data['result']:
-        #print(i)        
-        if tcoin == i:
-            t= tcoin
+def pairSubXZ(pair):
+    for asset, _ in assets.items():
+        print(asset)        
+        if pair == asset:
+            pair = pair
             break
-        if tcoin == 'X'+i:
-            t = tcoin[1:]
+        if pair == 'X'+asset:
+            pair = pair[1:]
             break
-        if tcoin == 'Z'+i:
-            t = tcoin[1:]
+        if pair == 'Z'+asset:
+            pair = pair[1:]
             break          
-    return t    
+    return pair    
 
 
 # ttcode fix for ADAEUR pair convert 6len to standard 8len XADAZEUR XcurrencyZfiat
-def pairAddXZ(strapi):
+def pairAddXZ(pair):
     #XXBTZEUR   #ADAEUR  
-    lstrapi = len(strapi)
-    if lstrapi == 6:       
-        part1 = strapi[0:3]
-        part2 = strapi[3:6]
-        res = 'X' + part1 + 'Z' +  part2   
+    lenpair = len(pair)
+    if lenpair == 6:       
+        part1 = pair[0:3]
+        part2 = pair[3:6]
+        pair = 'X' + part1 + 'Z' +  part2   
     else:
-        res = strapi
-    return res
-
+        pair = pair
+    return pair
 
 
 def assets_in_pair(pair):      
     for asset, _ in assets.items():
-        # If TRUE, we know that 'to_asset' exists in assets
         if pair.endswith(asset):
             from_asset = pair[:len(asset)]
             to_asset = pair[len(pair)-len(asset):]
@@ -2262,30 +2257,7 @@ def assets_in_pair(pair):
             if from_asset in assets:
                 return from_asset, to_asset
             else:
-                #fix forada and other 6len
-                return None, to_asset #ori
-                #return from_asset, to_asset
-
-    return None, None
-
-# ttcode fix for ADAEUR pair convert 6len to standard 8len XADAZEUR XcurrencyZfiat
-# From pair string (XXBTZEUR) get from-asset (XXBT) and to-asset (ZEUR)
-def assets_in_pair2(pair):
-    
-    #chek long pair forknow format and fix kraken pair 6len or 8 len pair string (XXBTZEUR)
-    pair = pairAddXZ(pair)    
-    
-    for asset, _ in assets.items():
-        # If TRUE, we know that 'to_asset' exists in assets
-        if pair.endswith(asset):
-            from_asset = pair[:len(asset)]
-            to_asset = pair[len(pair)-len(asset):]
-
-            # If TRUE, we know that 'from_asset' exists in assets
-            if from_asset in assets:
-                return from_asset, to_asset
-            else:
-                #fix for ada and other 6len pairs
+                #fix currencyfiat 6len
                 #return None, to_asset #ori
                 return from_asset, to_asset
 
