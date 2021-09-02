@@ -361,7 +361,7 @@ def alerts_cmd(update: Update, context: CallbackContext):
                 lineprice = line['price']
                 linealert_clean = linealert.replace('new alert','')
                 alerts_list.append(linealert_clean +' '+ linecurrency + ' ' + lineprice )
-                update.message.reply_text(bold(linealert_clean +' '+ linecurrency + ' ' + lineprice ), parse_mode=ParseMode.MARKDOWN)
+                update.message.reply_text(bold(e_ntf  +linealert_clean +' '+ linecurrency + ' ' + lineprice ), parse_mode=ParseMode.MARKDOWN)
     else:
         update.message.reply_text(e_fns + bold("No open alerts"), parse_mode=ParseMode.MARKDOWN)
         return ConversationHandler.END
@@ -2790,29 +2790,21 @@ def my_callback_function():
             for asset, trade_pair in pairs.items():
                 req_data["pair"] += trade_pair + ","
     
-            req_data = {"pair": pairs[linecurrency]}
-            
-            res_data = kraken_api("Ticker", data=req_data, private=False)                
-                
+            req_data = {"pair": pairs[linecurrency]}           
+            res_data = kraken_api("Ticker", data=req_data, private=False)             
             last_trade_price = trim_zeros(res_data["result"][req_data["pair"]]["c"][0])            
-           # print('Operation :' + linecurrency +" " + linealert + " " + last_trade_price + " <>= " + lineprice)           
-           # print('linealert :' + linealert)
-           # print('lineprice :' + lineprice)
-           # print('lastradeprice :' + last_trade_price)           
-            
-            #alert if pricemarket is menor o igual
+
+            #DOWN alert if pricemarket is menor o igual
             if((linealert == 'new alert down') and (float(last_trade_price) <= float(lineprice))):
                 updater = Updater(token=config["bot_token"])    
-                msg = e_ntf + e_dwt + e_adw + linecurrency + ' = ' + last_trade_price + '€ ' +'  ' + e_ntf +' '+ lineprice +'€ '
-                updater.bot.send_message(chat_id=config["user_id"], text=msg)
-                #print('Operation Down OK :' + linecurrency +" " + linealert + " " + last_trade_price + " <= " + lineprice)
+                msg = e_ntf + e_red + bold(linecurrency) +' '+ e_adw + bold(lineprice) + bold('€ ') +'  ' + bold('>') +' '+ bold(str(round(float(last_trade_price),2))) +bold('€ ')
+                updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)
                 
-            #alert if pricemarket is mayor o igual
+            #UP alert if pricemarket is mayor o igual
             if((linealert == 'new alert up') and (float(last_trade_price) >= float(lineprice))):
                 updater = Updater(token=config["bot_token"])    
-                msg = e_ntf + e_upt + e_aup + linecurrency + ' = ' + last_trade_price + '€ ' +'  ' + e_ntf +' '+ lineprice +'€ '
-                updater.bot.send_message(chat_id=config["user_id"], text=msg)
-                #print('Operation Up OK :' + linecurrency +" " + linealert + " " + last_trade_price + " >= " + lineprice)
+                msg = e_ntf + e_gre + bold(linecurrency) +' '+ e_aup + bold(lineprice) + bold('€ ') +'  ' + bold('<') +' '+ bold(str(round(float(last_trade_price),2))) + bold('€ ')
+                updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)
        
             
 ########### TIMER THREAD

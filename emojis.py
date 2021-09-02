@@ -31,3 +31,5 @@ e_upt = "📈 "  # chart up
 e_dwt = "📉 "  # chart dw
 e_nin = "🥷 "  # ninja
 e_cal = "🗓️ "  #calendar
+e_red = "🔴 "  #circle red
+e_gre = "🟢 "  #circle green
