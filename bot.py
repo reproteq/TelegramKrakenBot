@@ -239,17 +239,14 @@ def alert_remove_all(update: Update, context: CallbackContext):
         cancel_btn.insert(0, KeyboardButton(KeyboardEnum.ALL_ALERT.clean()))
     #remove all alerts
     if chat_data["alert"].upper() == KeyboardEnum.REMOVE_ALL_ALERTS.clean():
-        cancel_btn.insert(0, KeyboardButton(KeyboardEnum.REMOVE_ALL_ALERTS.clean()))
-        
-        
-        
+        cancel_btn.insert(0, KeyboardButton(KeyboardEnum.REMOVE_ALL_ALERTS.clean()))                     
         update.message.reply_text(e_wit + italic("Retrieving alerts ..."), parse_mode=ParseMode.MARKDOWN)
         file_path = "alerts.json"  
         filesize = os.path.getsize(file_path) 
         # Reset global orders list
  
         if filesize != 0:
-                    #remove all lines file alerts.json
+            #remove all lines file alerts.json
             file_path = "alerts.json"
             f = open(file_path, 'w')
             f.write('')
@@ -266,19 +263,6 @@ def alert_remove_all(update: Update, context: CallbackContext):
             return WorkflowEnum.ALERT_REMOVE_ALL       
         
         return WorkflowEnum.ALERT_REMOVE_ALL
-        
-        '''
-        #remove all lines file alerts.json
-        file_path = "alerts.json"
-        f = open(file_path, 'w')
-        f.write('')
-        f.close()
-        #exit
-        msg = e_ala + "Deleted alerts" + e_fns
-        update.message.reply_text(bold(msg), reply_markup=keyboard_cmds(), parse_mode=ParseMode.MARKDOWN)
-        return ConversationHandler.END
-        #return(update, context)
-        '''
 
     #show all alerts
     if chat_data["alert"].upper() == KeyboardEnum.VIEW_ALL_ALERTS.clean():
