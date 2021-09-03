@@ -28,7 +28,7 @@ class WorkflowEnum(Enum):
     ALERTON_OK = auto()
     ALERTON_CHEK = auto()
     ALERT_ACTIVE = auto()
-    ALERT_NEW_REMOVE_ALL = auto()
+    ALERT_REMOVE_ALL = auto()
     ALERT_CURRENCY = auto()
     ALERT_CONFIRM = auto()
     ALERT_PRICE = auto()
@@ -59,9 +59,9 @@ class KeyboardEnum(Enum):
     MARKET_PRICE = auto()
     #ttcode
  
-    NEW_ALERT = auto()
-    NEW_ALERT_UP = auto()
-    NEW_ALERT_DOWN = auto()
+    ALERT = auto()
+    ALERT_UP = auto()
+    ALERT_DOWN = auto()
     REMOVE_ALERT = auto()
     REMOVE_ALL_ALERTS = auto()
     ALL_ALERT = auto()

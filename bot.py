@@ -213,8 +213,8 @@ def alert_cmd(update: Update, context: CallbackContext):
     update.message.reply_text(e_ala + "Alerts System " + e_ntf)      
     reply_msg = "Selecct option ..."
     buttons = [
-        KeyboardButton(KeyboardEnum.NEW_ALERT_DOWN.clean()),
-        KeyboardButton(KeyboardEnum.NEW_ALERT_UP.clean()),        
+        KeyboardButton(KeyboardEnum.ALERT_DOWN.clean()),
+        KeyboardButton(KeyboardEnum.ALERT_UP.clean()),        
         KeyboardButton(KeyboardEnum.REMOVE_ALL_ALERTS.clean()),
         KeyboardButton(KeyboardEnum.VIEW_ALL_ALERTS.clean())
 
@@ -225,9 +225,9 @@ def alert_cmd(update: Update, context: CallbackContext):
     reply_mrk = ReplyKeyboardMarkup(menu, resize_keyboard=True)
     update.message.reply_text(reply_msg, reply_markup=reply_mrk)
 
-    return WorkflowEnum.ALERT_NEW_REMOVE_ALL    
+    return WorkflowEnum.ALERT_REMOVE_ALL    
 
-def alert_new_remove_all(update: Update, context: CallbackContext):
+def alert_remove_all(update: Update, context: CallbackContext):
     chat_data = context.chat_data
     clear_chat_data(chat_data)
     
@@ -235,11 +235,39 @@ def alert_new_remove_all(update: Update, context: CallbackContext):
     reply_msg = "Choose currency"
     cancel_btn = [KeyboardButton(KeyboardEnum.CANCEL.clean())]
     #new aler
-    if chat_data["alert"].upper() == KeyboardEnum.NEW_ALERT.clean():
+    if chat_data["alert"].upper() == KeyboardEnum.ALERT.clean():
         cancel_btn.insert(0, KeyboardButton(KeyboardEnum.ALL_ALERT.clean()))
     #remove all alerts
     if chat_data["alert"].upper() == KeyboardEnum.REMOVE_ALL_ALERTS.clean():
         cancel_btn.insert(0, KeyboardButton(KeyboardEnum.REMOVE_ALL_ALERTS.clean()))
+        
+        
+        
+        update.message.reply_text(e_wit + italic("Retrieving alerts ..."), parse_mode=ParseMode.MARKDOWN)
+        file_path = "alerts.json"  
+        filesize = os.path.getsize(file_path) 
+        # Reset global orders list
+ 
+        if filesize != 0:
+                    #remove all lines file alerts.json
+            file_path = "alerts.json"
+            f = open(file_path, 'w')
+            f.write('')
+            f.close()
+            #exit
+            msg = e_ala + "Deleted alerts" + e_fns
+            update.message.reply_text(bold(msg), reply_markup=keyboard_cmds(), parse_mode=ParseMode.MARKDOWN)
+            return WorkflowEnum.ALERT_REMOVE_ALL
+            #return(update, context)
+            
+            
+        else:
+            update.message.reply_text(e_fns + bold("No open alerts"), parse_mode=ParseMode.MARKDOWN)
+            return WorkflowEnum.ALERT_REMOVE_ALL       
+        
+        return WorkflowEnum.ALERT_REMOVE_ALL
+        
+        '''
         #remove all lines file alerts.json
         file_path = "alerts.json"
         f = open(file_path, 'w')
@@ -250,7 +278,7 @@ def alert_new_remove_all(update: Update, context: CallbackContext):
         update.message.reply_text(bold(msg), reply_markup=keyboard_cmds(), parse_mode=ParseMode.MARKDOWN)
         return ConversationHandler.END
         #return(update, context)
-
+        '''
 
     #show all alerts
     if chat_data["alert"].upper() == KeyboardEnum.VIEW_ALL_ALERTS.clean():
@@ -259,26 +287,28 @@ def alert_new_remove_all(update: Update, context: CallbackContext):
         file_path = "alerts.json"  
         filesize = os.path.getsize(file_path) 
  
-        if filesize != 0:        
+        if filesize != 0:
+            update.message.reply_text(e_wit + italic("Retrieving alerts ..."), parse_mode=ParseMode.MARKDOWN)
             #loop alerts
             file_path = "alerts.json"       
             with open(file_path) as f:
                for line in f:
-                   update.message.reply_text(e_ala + line)
+                   update.message.reply_text(e_ala + italic(line), parse_mode=ParseMode.MARKDOWN)
                    
-            update.message.reply_text("Show alls alerts")
+
             #return ConversationHandler.END
-            return WorkflowEnum.ALERT_NEW_REMOVE_ALL
+            return WorkflowEnum.ALERT_REMOVE_ALL
         
         else:
-            update.message.reply_text("No alerts")
+            update.message.reply_text(e_wit + italic("Retrieving alerts ..."), parse_mode=ParseMode.MARKDOWN)
+            update.message.reply_text(e_fns + bold("No open alerts"), parse_mode=ParseMode.MARKDOWN)
             #return ConversationHandler.END
-            return WorkflowEnum.ALERT_NEW_REMOVE_ALL
+            return WorkflowEnum.ALERT_REMOVE_ALL
 
         
     menu = build_menu(coin_buttons(), n_cols=3, footer_buttons=cancel_btn)
     reply_mrk = ReplyKeyboardMarkup(menu, resize_keyboard=True)
-    update.message.reply_text(reply_msg, reply_markup=reply_mrk)
+    update.message.reply_text(italic(reply_msg), reply_markup=reply_mrk, parse_mode=ParseMode.MARKDOWN)
 
     return WorkflowEnum.ALERT_CURRENCY
 
@@ -336,7 +366,7 @@ def alert_confirm(update: Update, context: CallbackContext):
     cancel_btn = [KeyboardButton(KeyboardEnum.CANCEL.clean())]
     menu = build_menu(buttons, n_cols=2, footer_buttons=cancel_btn)
     reply_mrk = ReplyKeyboardMarkup(menu, resize_keyboard=True)
-    update.message.reply_text(reply_msg, reply_markup=reply_mrk)
+    #update.message.reply_text(reply_msg, reply_markup=reply_mrk,parse_mode=ParseMode.MARKDOWN)
 
     #clear_chat_data(chat_data)
     msg = e_ala + "Created alert" + e_fns
@@ -360,7 +390,7 @@ def alerts_cmd(update: Update, context: CallbackContext):
                 linealert = line['alert']
                 linecurrency = line['currency']
                 lineprice = line['price']
-                linealert_clean = linealert.replace('new alert','')
+                linealert_clean = linealert.replace('alert','')
                 alerts_list.append(linealert_clean +' '+ linecurrency + ' ' + lineprice )
                 update.message.reply_text(bold(e_ntf  +linealert_clean +' '+ linecurrency + ' ' + lineprice ), parse_mode=ParseMode.MARKDOWN)
     else:
@@ -395,7 +425,7 @@ def alerts_choose_alert(update: Update, context: CallbackContext):
             alert_id = next(iter(alert), None)
             buttons.append(KeyboardButton(alert))
     else:
-        update.message.reply_text("No alerts")
+        update.message.reply_text("No open alerts")
         return ConversationHandler.END
         #return WorkflowEnum.ALERT_CLOSE_ALERT
     
@@ -430,7 +460,7 @@ def alerts_close_alert(update: Update, context: CallbackContext):
             li_al = line['alert']
             li_cur = line['currency']
             li_pri = line['price']
-            li_alrp = li_al.replace('new alert ','')
+            li_alrp = li_al.replace('alert ','')
            
             if ((li_alrp == al_tip) and (li_cur == al_cur) and (li_pri == al_pri)):
                 filename = file_path
@@ -461,7 +491,7 @@ def alerts_close_alert(update: Update, context: CallbackContext):
 # Close all open orders
 def alerts_close_all(update: Update, context: CallbackContext):
 
-    update.message.reply_text(e_wit + "Closing all alerts ...")
+    update.message.reply_text(e_wit + italic("Closing all alerts ..."), parse_mode=ParseMode.MARKDOWN)
 
     if alerts_list:
         file_path = "alerts.json"
@@ -2514,8 +2544,8 @@ dispatcher.add_handler(alerts_handler)
 alert_handler = ConversationHandler(
     entry_points=[CommandHandler('alert', alert_cmd)],
     states={
-        WorkflowEnum.ALERT_NEW_REMOVE_ALL:
-            [MessageHandler(Filters.regex("^(NEW ALERT UP|NEW ALERT DOWN|REMOVE ALL ALERTS|VIEW ALL ALERTS)$"), alert_new_remove_all, pass_chat_data=True),
+        WorkflowEnum.ALERT_REMOVE_ALL:
+            [MessageHandler(Filters.regex("^(ALERT UP|ALERT DOWN|REMOVE ALL ALERTS|VIEW ALL ALERTS)$"), alert_remove_all, pass_chat_data=True),
              MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)],
         WorkflowEnum.ALERT_CURRENCY:
             [MessageHandler(Filters.regex("^(" + regex_coin_or() + ")$"), alert_currency, pass_chat_data=True),
@@ -2767,13 +2797,13 @@ def my_callback_function():
             last_trade_price = trim_zeros(res_data["result"][req_data["pair"]]["c"][0])            
 
             #DOWN alert if pricemarket is menor o igual
-            if((linealert == 'new alert down') and (float(last_trade_price) <= float(lineprice))):
+            if((linealert == 'alert down') and (float(last_trade_price) <= float(lineprice))):
                 updater = Updater(token=config["bot_token"])    
                 msg = e_ntf + e_red + bold(linecurrency) +' '+ e_adw + bold(lineprice) + bold('€ ') +'  ' + bold('>') +' '+ bold(str(round(float(last_trade_price),2))) +bold('€ ')
                 updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)
                 
             #UP alert if pricemarket is mayor o igual
-            if((linealert == 'new alert up') and (float(last_trade_price) >= float(lineprice))):
+            if((linealert == 'alert up') and (float(last_trade_price) >= float(lineprice))):
                 updater = Updater(token=config["bot_token"])    
                 msg = e_ntf + e_gre + bold(linecurrency) +' '+ e_aup + bold(lineprice) + bold('€ ') +'  ' + bold('<') +' '+ bold(str(round(float(last_trade_price),2))) + bold('€ ')
                 updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)
