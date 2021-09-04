@@ -213,10 +213,12 @@ def alert_cmd(update: Update, context: CallbackContext):
     update.message.reply_text(e_ala + "Alerts System " + e_ntf)      
     reply_msg = "Selecct option ..."
     buttons = [
+        
         KeyboardButton(KeyboardEnum.ALERT_DOWN.clean()),
         KeyboardButton(KeyboardEnum.ALERT_UP.clean()),        
         KeyboardButton(KeyboardEnum.REMOVE_ALL_ALERTS.clean()),
-        KeyboardButton(KeyboardEnum.VIEW_ALL_ALERTS.clean())
+        KeyboardButton(KeyboardEnum.VIEW_ALL_ALERTS.clean()),
+        KeyboardButton(KeyboardEnum.ALERT_PERCENT.clean())
 
     ]
 
@@ -230,7 +232,7 @@ def alert_cmd(update: Update, context: CallbackContext):
 def alert_remove_all(update: Update, context: CallbackContext):
     chat_data = context.chat_data
     clear_chat_data(chat_data)
-    
+    print("-----------------------------------------------")
     chat_data["alert"] = update.message.text.lower()
     reply_msg = "Choose currency"
     cancel_btn = [KeyboardButton(KeyboardEnum.CANCEL.clean())]
@@ -251,6 +253,12 @@ def alert_remove_all(update: Update, context: CallbackContext):
             f = open(file_path, 'w')
             f.write('')
             f.close()
+            #remove all lines file prices.json
+            file_path = "prices.json"
+            f = open(file_path, 'w')
+            f.write('')
+            f.close()
+            
             #exit
             msg = e_ala + "Deleted alerts" + e_fns
             update.message.reply_text(bold(msg), reply_markup=keyboard_cmds(), parse_mode=ParseMode.MARKDOWN)
@@ -308,7 +316,8 @@ def alert_currency(update: Update, context: CallbackContext):
     chat_data["two"] = asset_two
     cancel_btn = [KeyboardButton(KeyboardEnum.CANCEL.clean())]
     reply_mrk = ReplyKeyboardMarkup(build_menu( cancel_btn), resize_keyboard=True)
-    reply_msg = "Enter alert price coin in " + bold(assets[chat_data["two"]]["altname"])
+    #reply_msg = "Enter alert price coin in " + bold(assets[chat_data["two"]]["altname"])
+    reply_msg = italic("Enter price or percentage for alert")
     update.message.reply_text(reply_msg, reply_markup=reply_mrk, parse_mode=ParseMode.MARKDOWN)    
     return WorkflowEnum.ALERT_PRICE
 
@@ -479,6 +488,12 @@ def alerts_close_all(update: Update, context: CallbackContext):
 
     if alerts_list:
         file_path = "alerts.json"
+        f = open(file_path, 'w')
+        f.write('')
+        f.close()
+        
+        #remove all lines file prices.json
+        file_path = "prices.json"
         f = open(file_path, 'w')
         f.write('')
         f.close()
@@ -2529,7 +2544,7 @@ alert_handler = ConversationHandler(
     entry_points=[CommandHandler('alert', alert_cmd)],
     states={
         WorkflowEnum.ALERT_REMOVE_ALL:
-            [MessageHandler(Filters.regex("^(ALERT UP|ALERT DOWN|REMOVE ALL ALERTS|VIEW ALL ALERTS)$"), alert_remove_all, pass_chat_data=True),
+            [MessageHandler(Filters.regex("^(ALERT UP|ALERT DOWN|REMOVE ALL ALERTS|VIEW ALL ALERTS|ALERT PERCENT)$"), alert_remove_all, pass_chat_data=True),
              MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)],
         WorkflowEnum.ALERT_CURRENCY:
             [MessageHandler(Filters.regex("^(" + regex_coin_or() + ")$"), alert_currency, pass_chat_data=True),
@@ -2697,12 +2712,36 @@ if config["check_trade"] > 0:
 # SIGTERM or SIGABRT. This should be used most of the time, since
 # start_polling() is non-blocking and will stop the bot gracefully.
 
+######## Price % UpDwDetector   ###############
+#1 get price , 2 save price in json or dic ,3 cmp last-price with saved prices
+# get last price
+
+def LastPrice(currency):    
+    req_data = dict()
+    req_data["pair"] = str()    
+    # Add all configured asset pairs to the request
+    for asset, trade_pair in pairs.items():
+        req_data["pair"] += trade_pair + ","
+    
+    req_data = {"pair": pairs[currency]}           
+    res_data = kraken_api("Ticker", data=req_data, private=False)             
+    last_price = trim_zeros(res_data["result"][req_data["pair"]]["c"][0])     
+
+    return last_price
+
+
+def DifPercen(a, b):
+    return ((b/a) * 100) - 100
+########### End UpDwDetector ###########
 
 ###### ALERT LOOP TIMER THREAD  IN #######
 global alerts_timer
 global alerts_sleeper
 alerts_timer = config["alerts_timer"]  # sec
 alerts_sleeper = config["alerts_sleeper"] # sec
+#detector for alerts percentage
+global detector_timer
+detector_timer = config["detector_timer"]
 
 
 class TimerThread(threading.Thread):
@@ -2758,46 +2797,110 @@ class TimerThread(threading.Thread):
     def terminate(self):
         self.terminate_event.set()
 
-######### CALLBACK ALERT LOOP
-def my_callback_function():
-    #print ('Alert callback ...')  
+######### CALLBACK  LOOP
+counterCall = 0
+def CallBack():    
+    #alerts 
     file_path = "alerts.json" 
     with jsonlines.open(file_path) as f:
         for line in f.iter():
             linealert = line['alert']
             linecurrency = line['currency']
             lineprice = line['price']
-
-            
-            req_data = dict()
-            req_data["pair"] = str()
-    
-            # Add all configured asset pairs to the request
-            for asset, trade_pair in pairs.items():
-                req_data["pair"] += trade_pair + ","
-    
-            req_data = {"pair": pairs[linecurrency]}           
-            res_data = kraken_api("Ticker", data=req_data, private=False)             
-            last_trade_price = trim_zeros(res_data["result"][req_data["pair"]]["c"][0])            
-
+            global linepercent
+            linepercent = lineprice# para usar en la parte de porcentaje
+            last_price =  LastPrice(linecurrency)
             #DOWN alert if pricemarket is menor o igual
-            if((linealert == 'alert down') and (float(last_trade_price) <= float(lineprice))):
+            if((linealert == 'alert down') and (float(last_price) <= float(lineprice))):
                 updater = Updater(token=config["bot_token"])    
-                msg = e_ntf + e_red + bold(linecurrency) +' '+ e_adw + bold(lineprice) + bold('€ ') +'  ' + bold('>') +' '+ bold(str(round(float(last_trade_price),2))) +bold('€ ')
+                msg = e_ntf + e_red + bold(linecurrency) +' '+ e_adw + bold(lineprice) + bold('€ ') +'  ' + bold('>') +' '+ bold(str(round(float(last_price),2))) +bold('€ ')
                 updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)
                 
             #UP alert if pricemarket is mayor o igual
-            if((linealert == 'alert up') and (float(last_trade_price) >= float(lineprice))):
+            if((linealert == 'alert up') and (float(last_price) >= float(lineprice))):
                 updater = Updater(token=config["bot_token"])    
-                msg = e_ntf + e_gre + bold(linecurrency) +' '+ e_aup + bold(lineprice) + bold('€ ') +'  ' + bold('<') +' '+ bold(str(round(float(last_trade_price),2))) + bold('€ ')
+                msg = e_ntf + e_gre + bold(linecurrency) +' '+ e_aup + bold(lineprice) + bold('€ ') +'  ' + bold('<') +' '+ bold(str(round(float(last_price),2))) + bold('€ ')
                 updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)
+ 
+ 
+            #ALert Percent    
+            if(linealert == 'alert percent'):                
+                
+                global counterCall
+                counterCall = counterCall+1
+                #print("-------------------counterCall"+ str(counterCall ))
+
+                coin = linecurrency
+                
+                #print("coin"+coin)
+                #print ("-------detectortime"+ str(detector_timer))
+               
+                if counterCall < detector_timer:
+                    #get last price per coin
+                    
+                    last_price = LastPrice(coin)
+                    #print("last_price"+ last_price) 
+                    #write json line coin:price  
+                    file_path = "prices.json"
+                    with open(file_path, 'a') as file:
+                        jsonlstr = '{"coin":"'+coin +'","price":"'+str(last_price)+'"}'
+                        file.write(str(jsonlstr) +"\n")
+                     
+                    #read json line     
+                    file_path = "prices.json"
+                    with jsonlines.open(file_path) as f:
+                        for line in f.iter():
+                            linecoin = line['coin']
+                            lineprice = line['price']          
+                            #print("coin:"+ linecoin + " price:"+lineprice)
+                            
+                            #percent_n = linepercent leido json alerts como precio
+                            percent_n = float(linepercent)
+                            #print("percent_n or lineprice"+ str(percent_n))
+                            percent = (float(last_price) * float(percent_n)) / 100
+                            dwper = float(last_price) - percent
+                            upper = float(last_price) + percent
+                            
+                            perdif = DifPercen(float(lineprice),float(last_price)) 
+                            #percent_dw = DifPercen(float(lineprice),float(last_price)) 
+                            #print ("percent "+str(round(percent,2)))
+                            
+                            if float(lineprice) < dwper:
+                                #print("precio cayo un "+ str(percent_n) + "%")
+                                updater = Updater(token=config["bot_token"])
+                                msg = e_ntf + e_gre + bold(linecoin) + str(percent_n) + bold(' % ')+ e_aup + bold(str(round(perdif,2))) + bold('% ')  +   ' ' + bold(str(round(float(last_price),2))) + bold('€ ')
+                                updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)
+                                
+                           
+                            if float(lineprice) > upper:
+                                #print("precio subio un "+ str(percent_n) + "%")
+                                updater = Updater(token=config["bot_token"])
+                                msg = e_ntf + e_red + bold(linecoin) + str(percent_n) + bold(' % ')  + e_adw + bold(str(round(perdif,2))) +bold('% ') + ' ' + bold(str(round(float(last_price),2))) +bold('€ ')
+                                updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)
+                                 
+            
+                else:
+                    #clear file prices.json
+                    #if filesize != 0:
+                    #remove all lines file alerts.json
+                    file_path = "prices.json"
+                    f = open(file_path, 'w')
+                    f.write('')
+                    f.close()        
+                    #clear var
+                    counterCall = 0
+            
+                ##########################
+                
+                
+                
        
             
 ########### TIMER THREAD
 timeout = alerts_timer # sec
 sleep_chunk = alerts_sleeper  # sec
 
-tmr = TimerThread(timeout, sleep_chunk, my_callback_function)
+tmr = TimerThread(timeout, sleep_chunk, CallBack)
 tmr.start()
 
 alertsw = ''
