@@ -258,6 +258,8 @@ def alert_remove_all(update: Update, context: CallbackContext):
             f = open(file_path, 'w')
             f.write('')
             f.close()
+            global counterCall      
+            counterCall = 0
             
             #exit
             msg = e_ala + "Deleted alerts" + e_fns
@@ -472,9 +474,21 @@ def alerts_close_alert(update: Update, context: CallbackContext):
                 for line_number, line_content in file_lines.items():
                     if line_number != line_to_delete:
                         f.write('{}\n'.format(line_content))
+                        
+                                         #setting 0 timer counterCall and erase all json prices
+                    if li_al == "alert percent":
+                        file_prices = "prices.json"
+                        fi = open(file_prices, 'w')
+                        fi.write('')
+                        fi.close()
+                        global counterCall        
+                        counterCall = 0   
                 
                 f.close()
-                #print('Deleted line: {}'.format(line_to_delete))                
+                #print('Deleted line: {}'.format(line_to_delete))
+                
+
+                    
     
     msg = e_fns + bold("Alert closed " + req_data)
     update.message.reply_text(msg, reply_markup=keyboard_cmds(), parse_mode=ParseMode.MARKDOWN)
@@ -497,6 +511,8 @@ def alerts_close_all(update: Update, context: CallbackContext):
         f = open(file_path, 'w')
         f.write('')
         f.close()
+        global counterCall        
+        counterCall = 0
         
         msg = e_fns + bold("Alls alerts closed ")
         update.message.reply_text(msg, reply_markup=keyboard_cmds(), parse_mode=ParseMode.MARKDOWN)
@@ -2712,10 +2728,8 @@ if config["check_trade"] > 0:
 # SIGTERM or SIGABRT. This should be used most of the time, since
 # start_polling() is non-blocking and will stop the bot gracefully.
 
-######## Price % UpDwDetector   ###############
-#1 get price , 2 save price in json or dic ,3 cmp last-price with saved prices
-# get last price
 
+# get last price
 def LastPrice(currency):    
     req_data = dict()
     req_data["pair"] = str()    
@@ -2729,26 +2743,24 @@ def LastPrice(currency):
 
     return last_price
 
-
+# get diff percent
 def DifPercen(a, b):
     return ((b/a) * 100) - 100
-########### End UpDwDetector ###########
+
 
 ###### ALERT LOOP TIMER THREAD  IN #######
+#vars config
 global alerts_timer
 global alerts_sleeper
+global detector_timer
 alerts_timer = config["alerts_timer"]  # sec
 alerts_sleeper = config["alerts_sleeper"] # sec
-#detector for alerts percentage
-global detector_timer
-detector_timer = config["detector_timer"]
+detector_timer = config["detector_timer"] # looper
 
-
-class TimerThread(threading.Thread):
-   
+# thread timer class
+class TimerThread(threading.Thread):   
     def __init__(self, timeout=alerts_timer, sleep_chunk=alerts_sleeper, callback=None, *args):
         threading.Thread.__init__(self)
-
         self.timeout = timeout
         self.sleep_chunk = sleep_chunk
         if callback == None:
@@ -2756,7 +2768,6 @@ class TimerThread(threading.Thread):
         else:
             self.callback = callback
         self.callback_args = args
-
         self.terminate_event = threading.Event()
         self.start_event = threading.Event()
         self.reset_event = threading.Event()
@@ -2765,18 +2776,12 @@ class TimerThread(threading.Thread):
     def run(self):
         while not self.terminate_event.is_set():
             while self.count > 0 and self.start_event.is_set():
-                # print self.count
-                # time.sleep(self.sleep_chunk)
-                # if self.reset_event.is_set():
                 if self.reset_event.wait(self.sleep_chunk):  # wait for a small chunk of timeout
                     self.reset_event.clear()
                     self.count = self.timeout/self.sleep_chunk  # reset
                 self.count -= 1
             if self.count <= 0:
-                self.start_event.clear()            
-                #ttcode
-                #self.callback(*self.callback_args)
- 
+                self.start_event.clear()           
                 self.callback()
                 self.count = self.timeout/self.sleep_chunk  #reset
 
@@ -2798,18 +2803,22 @@ class TimerThread(threading.Thread):
         self.terminate_event.set()
 
 ######### CALLBACK  LOOP
-counterCall = 0
-def CallBack():    
-    #alerts 
+ #alerts syscall
+counterCall = 0 #reset counter loop
+def CallBack():   
+
+    #read file alerts json and process data line to line
     file_path = "alerts.json" 
     with jsonlines.open(file_path) as f:
         for line in f.iter():
-            linealert = line['alert']
+            linealert = line['alert']            
+            global linecurrency
             linecurrency = line['currency']
-            lineprice = line['price']
+            lineprice = line['price']            
             global linepercent
-            linepercent = lineprice# para usar en la parte de porcentaje
+            linepercent = lineprice # this value can do price fiat or percentage 
             last_price =  LastPrice(linecurrency)
+            
             #DOWN alert if pricemarket is menor o igual
             if((linealert == 'alert down') and (float(last_price) <= float(lineprice))):
                 updater = Updater(token=config["bot_token"])    
@@ -2823,78 +2832,56 @@ def CallBack():
                 updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)
  
  
-            #ALert Percent    
-            if(linealert == 'alert percent'):                
-                
+            #ALert Percent  
+            if(linealert == 'alert percent' ):               
                 global counterCall
                 counterCall = counterCall+1
-                #print("-------------------counterCall"+ str(counterCall ))
-
                 coin = linecurrency
-                
-                #print("coin"+coin)
-                #print ("-------detectortime"+ str(detector_timer))
                
                 if counterCall < detector_timer:
-                    #get last price per coin
-                    
-                    last_price = LastPrice(coin)
-                    #print("last_price"+ last_price) 
-                    #write json line coin:price  
-                    file_path = "prices.json"
-                    with open(file_path, 'a') as file:
-                        jsonlstr = '{"coin":"'+coin +'","price":"'+str(last_price)+'"}'
+                    #get last price per coin                    
+                    lprice = LastPrice(coin)                    
+                    #save  prices in json line per coin :price
+                    file_prices = "prices.json"
+                    with open(file_prices, 'a') as file:
+                        jsonlstr = '{"coin":"'+coin +'","price":"'+str(lprice)+'"}'
                         file.write(str(jsonlstr) +"\n")
                      
                     #read json line     
-                    file_path = "prices.json"
-                    with jsonlines.open(file_path) as f:
+                    file_prices = "prices.json"
+                    with jsonlines.open(file_prices) as f:
                         for line in f.iter():
-                            linecoin = line['coin']
-                            lineprice = line['price']          
-                            #print("coin:"+ linecoin + " price:"+lineprice)
-                            
-                            #percent_n = linepercent leido json alerts como precio
+                            licoin = line['coin']
+                            liprice = line['price']          
                             percent_n = float(linepercent)
-                            #print("percent_n or lineprice"+ str(percent_n))
-                            percent = (float(last_price) * float(percent_n)) / 100
-                            dwper = float(last_price) - percent
-                            upper = float(last_price) + percent
+                            percent = (float(lprice) * float(percent_n)) / 100
+                            dwper = float(lprice) - percent
+                            upper = float(lprice) + percent                            
+                            perdif = DifPercen(float(liprice),float(lprice)) 
                             
-                            perdif = DifPercen(float(lineprice),float(last_price)) 
-                            #percent_dw = DifPercen(float(lineprice),float(last_price)) 
-                            #print ("percent "+str(round(percent,2)))
-                            
-                            if float(lineprice) < dwper:
-                                #print("precio cayo un "+ str(percent_n) + "%")
+                            #alert percent down
+                            if ((float(liprice) < dwper) and (licoin == linecurrency)):
                                 updater = Updater(token=config["bot_token"])
-                                msg = e_ntf + e_gre + bold(linecoin) + str(percent_n) + bold(' % ')+ e_aup + bold(str(round(perdif,2))) + bold('% ')  +   ' ' + bold(str(round(float(last_price),2))) + bold('€ ')
+                                msg = e_ntf + e_gre + bold(licoin) + bold(str(percent_n)) + bold(' % ')+ e_aup + bold(str(round(perdif,4))) + bold('% ')  +   ' ' + bold(str(round(float(lprice),2))) + bold('€ ')
                                 updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)
                                 
-                           
-                            if float(lineprice) > upper:
-                                #print("precio subio un "+ str(percent_n) + "%")
+                            #alert percent up
+                            if ((float(liprice) > upper) and (licoin == linecurrency)):
                                 updater = Updater(token=config["bot_token"])
-                                msg = e_ntf + e_red + bold(linecoin) + str(percent_n) + bold(' % ')  + e_adw + bold(str(round(perdif,2))) +bold('% ') + ' ' + bold(str(round(float(last_price),2))) +bold('€ ')
-                                updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)
-                                 
+                                msg = e_ntf + e_red + bold(licoin) + bold(str(percent_n)) + bold(' % ')  + e_adw + bold(str(round(perdif,4))) +bold('% ') + ' ' + bold(str(round(float(lprice),2))) +bold('€ ')
+                                updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)                               
             
                 else:
                     #clear file prices.json
-                    #if filesize != 0:
                     #remove all lines file alerts.json
-                    file_path = "prices.json"
-                    f = open(file_path, 'w')
+                    file_prices = "prices.json"
+                    f = open(file_prices, 'w')
                     f.write('')
                     f.close()        
                     #clear var
-                    counterCall = 0
-            
-                ##########################
+                    counterCall = 0            
+                    ######################## end loop counter percent
                 
-                
-                
-       
             
 ########### TIMER THREAD
 timeout = alerts_timer # sec
@@ -2919,10 +2906,9 @@ while True:
     if alertsw == 'Restart':
         #print('RestarTimer ...')
         tmr.restart_timer()
-    time.sleep(timeout)    
-
-
-######### ALERT LOOP TIMER THREAD END ################
+    time.sleep(timeout)
+    
+######### TIMER THREAD END ################
 
 updater.idle()
 
