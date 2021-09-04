@@ -1,25 +1,22 @@
-# Telegram Kraken Bot 
+# TelegramTradeBot  PRIVATE VERSION
+# TelegramKrakenBot   🤖 💱
 ---
-## Python3 Telegram Bot For Easy & Fast Trade in Kraken platform 🤖 💱 🚀
-
-### ❗ Important, No autotrade with strategies or others, This bot is only virtual assistant for easy and fast trade ❗
+## Python3 Telegram Bot For Trading in Kraken exchange
 
 ![alt tag](https://github.com/reproteq/TelegramKrakenBot/blob/main/TelegramKrakenBot.gif) 
-
-
-[![Alt text](https://img.youtube.com/vi/Rrmb_6cPzFE/0.jpg)](https://www.youtube.com/watch?v=Rrmb_6cPzFE)
 
 ---
 
 > #### Functions
- 
+
   - Trading
   - Buy
   - Sell
   - Orders 
   - Balance
   - Alerts up price 
-  - Alerts down price 
+  - Alerts down price
+  - Alerts percentage
   - Alerts On/Off
   - Currency prices 
   - Funding 
@@ -136,5 +133,4 @@ Tested versions
 
   Skype: Reproteq 
 
-  Special thanks Endogen 🖖   
-
+  Special thanks Endogen 🖖
