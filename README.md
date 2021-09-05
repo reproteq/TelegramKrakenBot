@@ -92,6 +92,11 @@ To start the bot permanently so that it does not close when you close the window
 
  - nohup python3 bot.py &
 
+To start the bot permanently so that it does not close when you close the window shell and not want create nohup.out for save memory execute:
+
+ -  nohup python3.6 bot.py >& /dev/null &
+
+
 
 
 Closing
