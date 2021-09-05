@@ -5,6 +5,9 @@
 
 ![alt tag](https://github.com/reproteq/TelegramKrakenBot/blob/main/TelegramKrakenBot.gif) 
 
+[![Alt text](https://img.youtube.com/vi/Rrmb_6cPzFE/0.jpg)](https://www.youtube.com/watch?v=Rrmb_6cPzFE)
+
+
 ---
 
 > #### Functions
