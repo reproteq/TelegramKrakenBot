@@ -2765,9 +2765,9 @@ def DifPercen(a, b):
 global alerts_timer
 global alerts_sleeper
 global detector_timer
-alerts_timer = config["alerts_timer"]  # sec
-alerts_sleeper = config["alerts_sleeper"] # sec
-detector_timer = config["detector_timer"] # looper
+alerts_timer = float(config["alerts_timer"])  # sec
+alerts_sleeper = float(config["alerts_sleeper"]) # sec
+detector_timer = float(config["detector_timer"]) # looper
 
 # thread timer class
 class TimerThread(threading.Thread):   
@@ -2876,13 +2876,15 @@ def CallBack():
                                 updater = Updater(token=config["bot_token"])
                                 msg = e_ntf + e_gre + bold(licoin) + bold(str(percent_n)) + bold(' % ')+ e_aup + bold(str(round(perdif,4))) + bold('% ')  +   ' ' + bold(str(round(float(lprice),2))) + bold('€ ')
                                 updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)
+                                time.sleep(float(alerts_timer))
                                 
                             #alert percent up
                             if ((float(liprice) > upper) and (licoin == linecurrency)):
                                 updater = Updater(token=config["bot_token"])
                                 msg = e_ntf + e_red + bold(licoin) + bold(str(percent_n)) + bold(' % ')  + e_adw + bold(str(round(perdif,4))) +bold('% ') + ' ' + bold(str(round(float(lprice),2))) +bold('€ ')
                                 updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)                               
-            
+                                time.sleep(float(alerts_timer))
+                                
                 else:
                     #clear file prices.json
                     #remove all lines file alerts.json
