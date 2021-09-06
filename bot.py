@@ -2924,6 +2924,7 @@ def CallBack():
                                 jsonli = str(line).replace("'", '"')
                                 jsonline = str(jsonli).replace(" ", '')
                                 noli(file_prices,jsonline)
+                                break
                                
                             
                             #alert percent down
@@ -2938,6 +2939,7 @@ def CallBack():
                                 jsonli = str(line).replace("'", '"')
                                 jsonline = str(jsonli).replace(" ", '')
                                 noli(file_prices,jsonline)
+                                break
                                                        
                                 
 
