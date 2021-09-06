@@ -540,8 +540,8 @@ def alerts_close_all(update: Update, context: CallbackContext):
 
 @restrict_access
 def alerton_cmd(update: Update, context: CallbackContext):
-    update.message.reply_text(e_ala + " ALERT YES/NO " + e_set)      
-    reply_msg = "ALERT"
+    update.message.reply_text(e_ntf + " Alerts Switch On-Off " + e_set )      
+    reply_msg = "Alerts"
     buttons = [
         KeyboardButton(KeyboardEnum.YES.clean()),
         KeyboardButton(KeyboardEnum.NO.clean())
@@ -556,18 +556,18 @@ def alerton_cmd(update: Update, context: CallbackContext):
  
 def alerton_chek(update: Update, context: CallbackContext):
     chat_data = context.chat_data
-    reply_msg = "ALERT"
+    #reply_msg = "ALERTS"
     global alertsw
     #alerts on
     if update.message.text.upper() == KeyboardEnum.YES.clean():
-        update.message.reply_text(e_ala + " ALERTS YES " + e_set)
+        update.message.reply_text(e_dne + bold(" Alerts Switch On ") , parse_mode=ParseMode.MARKDOWN)
         #alert switch on-off        
         alertsw = 'Restart' #thread alert control        
 
         
     #alerts off       
     if update.message.text.upper() == KeyboardEnum.NO.clean():
-        update.message.reply_text(e_ala + " ALERT NO " + e_set)
+        update.message.reply_text(e_fld + bold(" Alerts Switch Off ")  , parse_mode=ParseMode.MARKDOWN)
         #alert switch on-off
         alertsw = 'Stop'  #thread alert control 
    
@@ -580,10 +580,10 @@ def alerton_chek(update: Update, context: CallbackContext):
     cancel_btn = [KeyboardButton(KeyboardEnum.CANCEL.clean())]
     menu = build_menu(buttons, n_cols=2, footer_buttons=cancel_btn)
     reply_mrk = ReplyKeyboardMarkup(menu, resize_keyboard=True)
-    update.message.reply_text(reply_msg, reply_markup=reply_mrk)
+    #update.message.reply_text(reply_msg, reply_markup=reply_mrk)
 
     #clear_chat_data(chat_data)
-    msg = e_ala + " ALERT CONFIG FINISHED " + e_fns
+    msg = e_fns + " Alerts End" + e_set
     update.message.reply_text(bold(msg), reply_markup=keyboard_cmds(), parse_mode=ParseMode.MARKDOWN)
 
     return ConversationHandler.END
@@ -2741,6 +2741,7 @@ if config["check_trade"] > 0:
 # start_polling() is non-blocking and will stop the bot gracefully.
 
 
+
 # get last price
 def LastPrice(currency):    
     req_data = dict()
@@ -2751,13 +2752,42 @@ def LastPrice(currency):
     
     req_data = {"pair": pairs[currency]}           
     res_data = kraken_api("Ticker", data=req_data, private=False)             
-    last_price = trim_zeros(res_data["result"][req_data["pair"]]["c"][0])     
-
+    last_price = trim_zeros(res_data["result"][req_data["pair"]]["c"][0])   
     return last_price
+
 
 # get diff percent
 def DifPercen(a, b):
     return ((b/a) * 100) - 100
+
+
+#remove line dups from file
+def nodups(file):
+    lines_seen = set() # holds lines already seen    
+    with open(file, "r+") as f:
+        d = f.readlines()
+        f.seek(0)
+        for i in d:
+            if i not in lines_seen:
+                f.write(i)
+                lines_seen.add(i)
+        f.truncate()        
+    return
+
+
+#remove line used after alert sended
+def noli(file , li):
+    with open(file, "r+") as f:
+        d = f.readlines()
+        f.seek(0)
+        for i in d:
+            if str(li)+'\n' not in i:
+                f.write(i)
+        f.truncate()        
+    return 
+
+
+
 
 
 ###### ALERT LOOP TIMER THREAD  IN #######
@@ -2844,7 +2874,8 @@ def CallBack():
                 updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)
  
  
-            #ALert Percent  
+            #ALert Percent
+            #hay que eliminar la  linea procesada 
             if(linealert == 'alert percent' ):               
                 global counterCall
                 counterCall = counterCall+1
@@ -2853,14 +2884,24 @@ def CallBack():
                 if counterCall < detector_timer:
                     #get last price per coin                    
                     lprice = LastPrice(coin)                    
-                    #save  prices in json line per coin :price
+                    
+                    #remove duplicate lines                    
                     file_prices = "prices.json"
+                    nodups(file_prices)                       
+
+                    #write  prices in file json line per coin :price
+                    #file_prices = "prices.json"
                     with open(file_prices, 'a') as file:
                         jsonlstr = '{"coin":"'+coin +'","price":"'+str(lprice)+'"}'
                         file.write(str(jsonlstr) +"\n")
-                     
+                        
+                        
+                    #remove duplicate lines     
+                    nodups(file_prices) 
+
+
                     #read json line     
-                    file_prices = "prices.json"
+                    #file_prices = "prices.json"
                     with jsonlines.open(file_prices) as f:
                         for line in f.iter():
                             licoin = line['coin']
@@ -2870,20 +2911,36 @@ def CallBack():
                             dwper = float(lprice) - percent
                             upper = float(lprice) + percent                            
                             perdif = DifPercen(float(liprice),float(lprice)) 
+
+                            #alert percent up
+                            if ((float(liprice) > upper) and (licoin == linecurrency)):
+                                updater = Updater(token=config["bot_token"])
+                                msg = e_ntf + e_red + bold(licoin) + bold(str(percent_n)) + bold(' % ')  + e_adw + bold(str(round(perdif,4))) +bold('% ') +' '+ bold(str(round(float(liprice),2)))+' ' + bold(str(round(float(lprice),2))) +bold('€ ')
+                                updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)                               
+                                time.sleep(float(alerts_timer))
+                                
+                                #remove line after send alert
+                                file_prices = "prices.json"
+                                jsonli = str(line).replace("'", '"')
+                                jsonline = str(jsonli).replace(" ", '')
+                                noli(file_prices,jsonline)
+                               
                             
                             #alert percent down
                             if ((float(liprice) < dwper) and (licoin == linecurrency)):
                                 updater = Updater(token=config["bot_token"])
-                                msg = e_ntf + e_gre + bold(licoin) + bold(str(percent_n)) + bold(' % ')+ e_aup + bold(str(round(perdif,4))) + bold('% ')  +   ' ' + bold(str(round(float(lprice),2))) + bold('€ ')
+                                msg = e_ntf + e_gre + bold(licoin) + bold(str(percent_n)) + bold(' % ')+ e_aup + bold(str(round(perdif,4))) + bold('% ') +' ' + bold(str(round(float(liprice),2)))+  ' ' + bold(str(round(float(lprice),2))) + bold('€ ')
                                 updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)
                                 time.sleep(float(alerts_timer))
                                 
-                            #alert percent up
-                            if ((float(liprice) > upper) and (licoin == linecurrency)):
-                                updater = Updater(token=config["bot_token"])
-                                msg = e_ntf + e_red + bold(licoin) + bold(str(percent_n)) + bold(' % ')  + e_adw + bold(str(round(perdif,4))) +bold('% ') + ' ' + bold(str(round(float(lprice),2))) +bold('€ ')
-                                updater.bot.send_message(chat_id=config["user_id"], text=msg, parse_mode=ParseMode.MARKDOWN)                               
-                                time.sleep(float(alerts_timer))
+                                #remove line after send aler
+                                file_prices = "prices.json"
+                                jsonli = str(line).replace("'", '"')
+                                jsonline = str(jsonli).replace(" ", '')
+                                noli(file_prices,jsonline)
+                                                       
+                                
+
                                 
                 else:
                     #clear file prices.json
@@ -2893,9 +2950,10 @@ def CallBack():
                     f.write('')
                     f.close()        
                     #clear var
-                    counterCall = 0            
+                    counterCall = 0
+                    
                     ######################## end loop counter percent
-                
+                    
             
 ########### TIMER THREAD
 timeout = alerts_timer # sec
