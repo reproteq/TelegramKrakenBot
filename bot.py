@@ -218,7 +218,8 @@ def alert_cmd(update: Update, context: CallbackContext):
         KeyboardButton(KeyboardEnum.ALERT_UP.clean()),        
         KeyboardButton(KeyboardEnum.REMOVE_ALL_ALERTS.clean()),
         KeyboardButton(KeyboardEnum.VIEW_ALL_ALERTS.clean()),
-        KeyboardButton(KeyboardEnum.ALERT_PERCENT.clean())
+        KeyboardButton(KeyboardEnum.ALERT_PERCENT.clean()),
+        KeyboardButton(KeyboardEnum.TIMER_PERCENT.clean())
 
     ]
 
@@ -232,10 +233,21 @@ def alert_cmd(update: Update, context: CallbackContext):
 def alert_remove_all(update: Update, context: CallbackContext):
     chat_data = context.chat_data
     clear_chat_data(chat_data)
-    print("-----------------------------------------------")
     chat_data["alert"] = update.message.text.lower()
-    reply_msg = "Choose currency"
     cancel_btn = [KeyboardButton(KeyboardEnum.CANCEL.clean())]
+    
+    #alert percent and detector price counter
+    if chat_data["alert"].upper() == KeyboardEnum.TIMER_PERCENT.clean():
+        global counterCall
+        detector_timer = config["detector_timer"] # timer from config json
+        countdown = detector_timer - counterCall
+        cancel_btn.insert(0, KeyboardButton(KeyboardEnum.REMOVE_ALL_ALERTS.clean()))                     
+        update.message.reply_text(e_wit + italic("CountDown Price Detector ... " + str(countdown) ), parse_mode=ParseMode.MARKDOWN)
+        return WorkflowEnum.ALERT_REMOVE_ALL
+    
+    #Alert currency chooser
+    reply_msg = "Choose currency"
+
     #new aler
     if chat_data["alert"].upper() == KeyboardEnum.ALERT.clean():
         cancel_btn.insert(0, KeyboardButton(KeyboardEnum.ALL_ALERT.clean()))
@@ -258,7 +270,7 @@ def alert_remove_all(update: Update, context: CallbackContext):
             f = open(file_path, 'w')
             f.write('')
             f.close()
-            global counterCall      
+            #global counterCall      
             counterCall = 0
             
             #exit
@@ -2560,7 +2572,7 @@ alert_handler = ConversationHandler(
     entry_points=[CommandHandler('alert', alert_cmd)],
     states={
         WorkflowEnum.ALERT_REMOVE_ALL:
-            [MessageHandler(Filters.regex("^(ALERT UP|ALERT DOWN|REMOVE ALL ALERTS|VIEW ALL ALERTS|ALERT PERCENT)$"), alert_remove_all, pass_chat_data=True),
+            [MessageHandler(Filters.regex("^(ALERT UP|ALERT DOWN|REMOVE ALL ALERTS|VIEW ALL ALERTS|ALERT PERCENT|TIMER PERCENT)$"), alert_remove_all, pass_chat_data=True),
              MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)],
         WorkflowEnum.ALERT_CURRENCY:
             [MessageHandler(Filters.regex("^(" + regex_coin_or() + ")$"), alert_currency, pass_chat_data=True),

@@ -37,6 +37,7 @@ class WorkflowEnum(Enum):
     ALERTS_CLOSE_ALLS = auto()
     ALERTS_CLOSE_ALERT = auto()
     
+    
 # Enum for keyboard buttons
 class KeyboardEnum(Enum):
     BUY = auto()
@@ -62,6 +63,7 @@ class KeyboardEnum(Enum):
  
     ALERT = auto()
     ALERT_PERCENT = auto()
+    TIMER_PERCENT = auto()
     ALERT_UP = auto()
     ALERT_DOWN = auto()
     REMOVE_ALERT = auto()
