@@ -299,7 +299,7 @@ def alert_remove_all(update: Update, context: CallbackContext):
             file_path = "alerts.json"       
             with open(file_path) as f:
                for line in f:
-                   update.message.reply_text(e_ala + italic(line), parse_mode=ParseMode.MARKDOWN)
+                   update.message.reply_text(e_ntf + italic(line), parse_mode=ParseMode.MARKDOWN)
                    
 
             #return ConversationHandler.END
@@ -539,12 +539,12 @@ def alerts_close_all(update: Update, context: CallbackContext):
 ###### Alerts in
 
 @restrict_access
-def alerton_cmd(update: Update, context: CallbackContext):
-    update.message.reply_text(e_ntf + " Alerts Switch On-Off " + e_set )      
-    reply_msg = "Alerts"
+def mute_cmd(update: Update, context: CallbackContext):
+    update.message.reply_text(e_ntf + " Mute Alerts On-Off " + e_set )      
+    reply_msg = "Mute"
     buttons = [
-        KeyboardButton(KeyboardEnum.YES.clean()),
-        KeyboardButton(KeyboardEnum.NO.clean())
+        KeyboardButton(KeyboardEnum.ON.clean()),
+        KeyboardButton(KeyboardEnum.OFF.clean())
     ]  
     
     cancel_btn = [KeyboardButton(KeyboardEnum.CANCEL.clean())]
@@ -552,22 +552,22 @@ def alerton_cmd(update: Update, context: CallbackContext):
     reply_mrk = ReplyKeyboardMarkup(menu, resize_keyboard=True)
     update.message.reply_text(reply_msg, reply_markup=reply_mrk)
     #return ConversationHandler.END
-    return WorkflowEnum.ALERTON_CHEK
+    return WorkflowEnum.MUTE_CHEK
  
-def alerton_chek(update: Update, context: CallbackContext):
+def mute_chek(update: Update, context: CallbackContext):
     chat_data = context.chat_data
     #reply_msg = "ALERTS"
     global alertsw
     #alerts on
-    if update.message.text.upper() == KeyboardEnum.YES.clean():
-        update.message.reply_text(e_dne + bold(" Alerts Switch On ") , parse_mode=ParseMode.MARKDOWN)
+    if update.message.text.upper() == KeyboardEnum.OFF.clean():
+        update.message.reply_text(bold(" Mute Off") + e_fld  , parse_mode=ParseMode.MARKDOWN)
         #alert switch on-off        
         alertsw = 'Restart' #thread alert control        
 
         
     #alerts off       
-    if update.message.text.upper() == KeyboardEnum.NO.clean():
-        update.message.reply_text(e_fld + bold(" Alerts Switch Off ")  , parse_mode=ParseMode.MARKDOWN)
+    if update.message.text.upper() == KeyboardEnum.ON.clean():
+        update.message.reply_text( bold(" Mute On ") + e_dne  , parse_mode=ParseMode.MARKDOWN)
         #alert switch on-off
         alertsw = 'Stop'  #thread alert control 
    
@@ -583,7 +583,7 @@ def alerton_chek(update: Update, context: CallbackContext):
     #update.message.reply_text(reply_msg, reply_markup=reply_mrk)
 
     #clear_chat_data(chat_data)
-    msg = e_fns + " Alerts End" + e_set
+    msg = e_fns + " End Mute Switch" + e_set
     update.message.reply_text(bold(msg), reply_markup=keyboard_cmds(), parse_mode=ParseMode.MARKDOWN)
 
     return ConversationHandler.END
@@ -1594,6 +1594,7 @@ def bot_cmd(update: Update, context: CallbackContext):
         KeyboardButton(KeyboardEnum.SHUTDOWN.clean()),
         KeyboardButton(KeyboardEnum.SETTINGS.clean()),
         KeyboardButton(KeyboardEnum.API_STATE.clean()),
+        KeyboardButton(KeyboardEnum.COINS.clean()),
         KeyboardButton(KeyboardEnum.CANCEL.clean())
     ]
 
@@ -1626,7 +1627,7 @@ def bot_sub_cmd(update: Update, context: CallbackContext):
     # API State
     elif update.message.text.upper() == KeyboardEnum.API_STATE.clean():
         state_cmd(update, context)
-
+ 
     # Cancel
     elif update.message.text.upper() == KeyboardEnum.CANCEL.clean():
         return cancel(update, context)
@@ -1998,6 +1999,18 @@ def settings_confirm(update: Update, context: CallbackContext):
     # Restart bot to activate new setting
     restart_cmd(update, context)
 
+# coins
+def coins_cmd(update: Update, context: CallbackContext):
+    for asset, data in assets.items():
+        coins = data["altname"]
+        time.sleep(0.25)
+        msg = coins
+        update.message.reply_text(italic(msg), parse_mode=ParseMode.MARKDOWN)    
+       
+
+    return WorkflowEnum.BOT_SUB_CMD
+    
+
 
 # Remove all data from 'chat_data' since we are canceling / ending
 # the conversation. If this is not done, next conversation will
@@ -2074,7 +2087,7 @@ def keyboard_cmds():
         KeyboardButton("/bot"),
         KeyboardButton("/alerts"),
         KeyboardButton("/alert"),
-        KeyboardButton("/alertOn")      
+        KeyboardButton("/mute")      
     ]
 
     return ReplyKeyboardMarkup(build_menu(command_buttons, n_cols=3), resize_keyboard=True)
@@ -2480,7 +2493,7 @@ dispatcher.add_handler(CommandHandler("balance", balance_cmd))
 dispatcher.add_handler(CommandHandler("reload", reload_cmd))
 dispatcher.add_handler(CommandHandler("state", state_cmd))
 dispatcher.add_handler(CommandHandler("start", start_cmd))
-
+dispatcher.add_handler(CommandHandler("coins", coins_cmd))
 
 # FUNDING conversation handler
 funding_handler = ConversationHandler(
@@ -2592,20 +2605,20 @@ dispatcher.add_handler(alert_handler)
 
 
 
-# alertOn conversation handler
-alerton_handler = ConversationHandler(
-    entry_points=[CommandHandler('alerton', alerton_cmd)],
+# mute conversation handler
+mute_handler = ConversationHandler(
+    entry_points=[CommandHandler('mute', mute_cmd)],
     states={
-        WorkflowEnum.ALERTON_OK:
-            [MessageHandler(Filters.regex("^(YES|NO)$"), alerton_chek , pass_chat_data=True),             
+        WorkflowEnum.MUTE_OK:
+            [MessageHandler(Filters.regex("^(ON|OFF)$"), mute_chek , pass_chat_data=True),             
              MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)],
-        WorkflowEnum.ALERTON_CHEK:
-            [MessageHandler(Filters.regex("^(YES|NO)$"), alerton_chek , pass_chat_data=True),             
+        WorkflowEnum.MUTE_CHEK:
+            [MessageHandler(Filters.regex("^(ON|OFF)$"), mute_chek , pass_chat_data=True),             
              MessageHandler(Filters.regex("^(CANCEL)$"), cancel, pass_chat_data=True)]             
     },
     fallbacks=[MessageHandler(Filters.regex('cancel'), cancel, pass_chat_data=True)],
     allow_reentry=True)
-dispatcher.add_handler(alerton_handler)
+dispatcher.add_handler(mute_handler)
 
 # TRADE conversation handler
 trade_handler = ConversationHandler(
@@ -2689,6 +2702,7 @@ bot_handler = ConversationHandler(
             [MessageHandler(Filters.regex("^(UPDATE CHECK|UPDATE|RESTART|SHUTDOWN)$"), bot_sub_cmd),
              MessageHandler(Filters.regex("^(API STATE)$"), state_cmd),
              MessageHandler(Filters.regex("^(SETTINGS)$"), settings_cmd),
+             MessageHandler(Filters.regex("^(COINS)$"), coins_cmd),
              MessageHandler(Filters.regex("^(CANCEL)$"), cancel)],
         settings_change_state()[0]: settings_change_state()[1],
         settings_save_state()[0]: settings_save_state()[1],

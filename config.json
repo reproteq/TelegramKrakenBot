@@ -7,7 +7,7 @@
     "fee": 0.26,
     "alerts_timer": 3,
     "alerts_sleeper": 0.25,
-    "detector_timer": 100, 
+    "detector_timer": 8000,
     "update_url": "https://raw.githubusercontent.com/reproteq/TelegramKrakenBot/main/bot.py",
     "update_hash": "some_hash",
     "update_check": 0,
@@ -18,8 +18,10 @@
         "ADA": "EUR"
     },
     "coin_charts": {
-        "BTC": "https://tinyurl.com/y9p6g5a8",
+        "T7": "https://tinyurl.com/phs2wcy6",
+        "XBT": "https://tinyurl.com/y9p6g5a8",
         "ADA": "https://tinyurl.com/2usx5m9s"
+        
     },
     "log_level": 10,
     "log_to_file": false,

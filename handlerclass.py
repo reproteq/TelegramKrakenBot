@@ -25,8 +25,8 @@ class WorkflowEnum(Enum):
     SETTINGS_SAVE = auto()
     SETTINGS_CONFIRM = auto()
     #ttcode
-    ALERTON_OK = auto()
-    ALERTON_CHEK = auto()
+    MUTE_OK = auto()
+    MUTE_CHEK = auto()
     ALERT_ACTIVE = auto()
     ALERT_REMOVE_ALL = auto()
     ALERT_PERCENT = auto()
@@ -46,6 +46,8 @@ class KeyboardEnum(Enum):
     ALL = auto()
     YES = auto()
     NO = auto()
+    ON = auto()
+    OFF = auto()
     CANCEL = auto()
     CLOSE_ORDER = auto()
     CLOSE_ALL = auto()
@@ -59,6 +61,7 @@ class KeyboardEnum(Enum):
     SETTINGS = auto()
     API_STATE = auto()
     MARKET_PRICE = auto()
+    COINS = auto()
     #ttcode
  
     ALERT = auto()
