@@ -7,10 +7,6 @@ from telegram.ext.filters import Filters
 from emojis import *
 from handlerclass import *
 
-def main():
-    print('Telegram Trade Bot v2.0 Kraken')
-    return   
-
 if os.path.isfile("config.json"):
     with open("config.json") as config_file:
         config = json.load(config_file)
@@ -2999,6 +2995,3 @@ while True:
 ######### TIMER THREAD END ################
 
 updater.idle()
-
-if __name__ == '__main__':
-    main()
